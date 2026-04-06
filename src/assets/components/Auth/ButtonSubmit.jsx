@@ -4,7 +4,7 @@ import '../../../Global.css'
 /**
  * 
  * @param {object} props 
- * @param {string} label
+ * @param {string} props.label
  * @returns {JSX.Element}
  */
 
