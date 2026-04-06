@@ -1,5 +1,15 @@
 import React from 'react'
 
+/**
+ * 
+ * @param {object} props 
+ * @param {string} props.path
+ * @param {string} props.name
+ * @param {string} props.rating
+ * @param {string} props.review
+ * @returns {JSX.Element}
+ */
+
 function CardCustomer({path,name,rating, review}) {
   return (
     <div className='bg-white flex flex-col justify-center items-center'>
