@@ -1,5 +1,14 @@
 import React from 'react'
 
+/**
+ * 
+ * @param {object} props 
+ * @param {string} props.image
+ * @param {string} props.name
+ * @param {string} prop.description
+ * @returns {JSX.Element}
+ */
+
 function AboutApp({ image, name, description }) {
     return (
         <div className='bg-primary flex flex-col items-center gap-5 px-6 py-10 rounded-2xl text-white w-full h-auto shadow-lg'>
