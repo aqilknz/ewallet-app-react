@@ -1,6 +1,13 @@
 import React from 'react'
 import '../../../Global.css'
 
+/**
+ * 
+ * @param {object} props 
+ * @param {string} label
+ * @returns {JSX.Element}
+ */
+
 function ButtonSubmit({ label }) {
     return (
         <div className='w-full'>
