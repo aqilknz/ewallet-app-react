@@ -1,5 +1,14 @@
 import React from 'react'
 
+/**
+ * 
+ * @param {object} props 
+ * @param {string} props.icons
+ * @param {string} props.title
+ * @param {string} props.description
+ * @returns {JSX.Element}
+ */
+
 function FeatureItem({ icon, title, description }) {
     return (
         <div className="flex items-center gap-4 p-2 rounded-2xl">
