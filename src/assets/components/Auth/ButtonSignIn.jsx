@@ -3,9 +3,9 @@ import React from 'react'
 /**
  * 
  * @param {object} props 
- * @param {string} path
- * @param {string} alt
- * @param {string} text
+ * @param {string} props.path
+ * @param {string} props.alt
+ * @param {string} props.text
  * @returns {JSX.Element}
  */
 
