@@ -1,5 +1,14 @@
 import React from 'react'
 
+/**
+ * 
+ * @param {object} props 
+ * @param {string} path
+ * @param {string} alt
+ * @param {string} text
+ * @returns {JSX.Element}
+ */
+
 function ButtonSignIn({ path, alt, text }) {
     return (
         <div>
