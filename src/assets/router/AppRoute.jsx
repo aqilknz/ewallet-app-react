@@ -6,7 +6,7 @@ import LandingPage from '../pages/LandingPage.jsx'
 import Dashboard from '../pages/Dashboard.jsx'
 import Transfer from '../pages/Transfer.jsx'
 import History from '../pages/History.jsx'
-import TopUp from '../pages/topup.jsx'
+import TopUpPage from '../pages/TopUpPage.jsx'
 
 // import Register from '../pages/Register.jsx'
 // import Dashboard from '../pages/Dashboard.jsx'
@@ -22,7 +22,7 @@ function AppRoute() {
       <Route path='dashboard' element={<Dashboard />} />
       <Route path='transfer' element={<Transfer />} />
       <Route path='history' element={<History />} />
-      <Route path='topup' element={<TopUp />} />
+      <Route path='topup' element={<TopUpPage/>} />
     </Routes>
   )
 }
