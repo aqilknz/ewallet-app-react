@@ -1,6 +1,6 @@
-
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import Joi from 'joi' // Import Joi
 import '../../Global.css'
 import ButtonSubmit from '../components/Auth/ButtonSubmit.jsx'
 import ButtonSignIn from '../components/Auth/ButtonSignIn.jsx'
@@ -8,43 +8,74 @@ import InputForm from '../components/Auth/InputForm.jsx'
 
 function Login() {
     const navigate = useNavigate()
-    const [error, setError] =useState('')
-    const [FormData, setFormData] =useState({
-        email:'',
-        password:''
+    const [error, setError] = useState('')
+    const [FormData, setFormData] = useState({
+        email: '',
+        password: ''
     })
+
+    // 1. Schema Joi untuk validasi Login
+    const schema = Joi.object({
+        email: Joi.string()
+            .email({ tlds: { allow: false } })
+            .required()
+            .messages({
+                'string.empty': 'Email dan Password wajib diisi!',
+                'string.email': 'Format email tidak valid!',
+                'any.required': 'Email dan Password wajib diisi!'
+            }),
+        password: Joi.string()
+            .min(8)
+            .required()
+            .messages({
+                'string.empty': 'Email dan Password wajib diisi!',
+                'string.min': 'Password minimal harus 8 karakter!',
+                'any.required': 'Email dan Password wajib diisi!'
+            })
+    })
+
+    // 2. useEffect untuk validasi real-time (menghapus error saat user mengetik dengan benar)
+    useEffect(() => {
+        if (error) {
+            const { error: validationError } = schema.validate(FormData);
+            // Hanya hapus error jika Joi menyatakan input sudah valid secara format
+            if (!validationError) {
+                setError('');
+            }
+        }
+    }, [FormData]);
+
     const handleChange = (e) => {
         const { name, value } = e.target
         setFormData((prev) => ({
             ...prev,
             [name]: value
         }))
-        if (error) setError('')
     }
+
     const handleLogin = (e) => {
         e.preventDefault()
+
+        // 3. Validasi Format dengan Joi
+        const { error: validationError } = schema.validate(FormData);
+
+        if (validationError) {
+            setError(validationError.details[0].message);
+            return;
+        }
+
+        // 4. Logika Autentikasi LocalStorage
         const user = JSON.parse(localStorage.getItem('userAccount'))
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!FormData.email || !FormData.password) {
-            setError('Email dan Password wajib diisi!');
-            return;
-        }
-        if (!emailRegex.test(FormData.email)) {
-            setError('Format email tidak valid!');
-            return;
-        }
-        if (FormData.password.length < 8) {
-            setError('Password minimal harus 8 karakter!');
-            return;
-        }
-        if(!user){
+
+        if (!user) {
             setError('Akun tidak ditemukan, silahkan Register terlebih dahulu!')
             return
         }
-        if(FormData.email === user.email && FormData.password === user.password) {
+
+        if (FormData.email === user.email && FormData.password === user.password) {
             alert("Login Berhasil!");
             navigate('/dashboard');
-        } else{
+        } else {
             setError('Email dan Password salah!')
         }
     }
@@ -52,7 +83,7 @@ function Login() {
     return (
         <div className='flex min-h-screen md:bg-primary '>
             <section className='flex flex-1 bg-white justify-center flex-col px-20 py-8 md:rounded-r-4xl gap-2'>
-                <header className='flex justify-centeritems-center gap-2'>
+                <header className='flex items-center gap-2'>
                     <img src='/icons/logo.svg' alt='E-Wallet Logo' className='w-10 h-10' />
                     <span className='flex justify-center items-center font-bold font-nunito text-xl text-primary'>E-Wallet</span>
                 </header>
@@ -83,7 +114,9 @@ function Login() {
                 </form>
                 <p className='text-center text-gray-500 text-sm'>
                     <span>Not Have An Account? </span>
-                    <a href="/register" className='text-blue-500 hover:underline'>Register</a>
+                    <Link to="register" className="text-blue-500 hover:underline">
+                        Register
+                    </Link>
                 </p>
             </section>
             <section className='hidden md:flex md:flex-1'>
