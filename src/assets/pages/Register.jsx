@@ -1,6 +1,6 @@
-
-import React, { use, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import Joi from 'joi' // Import Joi
 import '../../Global.css'
 import ButtonSubmit from '../components/Auth/ButtonSubmit.jsx'
 import ButtonSignIn from '../components/Auth/ButtonSignIn.jsx'
@@ -16,50 +16,80 @@ function Register() {
         confirmPassword: ''
     })
 
+    // 1. Schema Joi untuk validasi
+    const schema = Joi.object({
+        email: Joi.string()
+            .email({ tlds: { allow: false } })
+            .required()
+            .messages({
+                'string.empty': 'Semua data wajib diisi!',
+                'string.email': 'Format email tidak valid!',
+                'any.required': 'Semua data wajib diisi!'
+            }),
+        password: Joi.string()
+            .min(8)
+            .required()
+            .messages({
+                'string.empty': 'Semua data wajib diisi!',
+                'string.min': 'Password minimal harus 8 karakter!',
+                'any.required': 'Semua data wajib diisi!'
+            }),
+        confirmPassword: Joi.any()
+            .equal(Joi.ref('password'))
+            .required()
+            .messages({
+                'any.only': 'Konfirmasi password tidak sesuai!',
+                'any.required': 'Semua data wajib diisi!'
+            })
+    })
+
+    // 2. useEffect untuk memantau perubahan input dan menghapus error
+    useEffect(() => {
+        if (error) {
+            const { error: validationError } = schema.validate(FormData);
+            if (!validationError) setError('');
+        }
+    }, [FormData]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
             [name]: value
         }));
-        if (error) setError('')
     };
 
     const handleRegister = (e) => {
         e.preventDefault()
-        if (!FormData.email || !FormData.password) {
-            setError('Semua data wajib diisi!');
+
+        // 3. Eksekusi validasi Joi
+        const { error: validationError } = schema.validate(FormData);
+
+        if (validationError) {
+            setError(validationError.details[0].message);
             return;
         }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(FormData.email)) {
-            setError('Format email tidak valid!');
-            return;
-        }
-        if (FormData.password.length < 8) {
-            setError('Password minimal harus 8 karakter!');
-            return;
-        }
-        if (FormData.password !== FormData.confirmPassword) {
-            setError('Konfirmasi password tidak sesuai!');
-            return;
-        }
+
+        // Simpan ke localStorage
         localStorage.setItem('userAccount', JSON.stringify({
             email: FormData.email,
             password: FormData.password
         }));
+
         setFormData({
-            email:'',
-            password:'',
-            confirmPassword:''
+            email: '',
+            password: '',
+            confirmPassword: ''
         })
+
         alert("Registrasi Berhasil!");
         navigate('/login');
     }
+
     return (
         <div className='flex min-h-screen bg-primary '>
             <section className='flex flex-1 bg-white justify-center flex-col px-8 md:px-20 py-20 md:rounded-r-4xl gap-2'>
-                <header className='flex justify-centeritems-center gap-2'>
+                <header className='flex items-center gap-2'>
                     <img src='/icons/logo.svg' alt='E-Wallet Logo' className='w-10 h-10' />
                     <span className='flex justify-center items-center font-bold font-nunito text-xl text-primary'>E-Wallet</span>
                 </header>
@@ -91,7 +121,7 @@ function Register() {
                 </form>
                 <p className='text-center text-gray-500 text-sm'>
                     <span>Have An Account? </span>
-                    <a href="/login" className='text-blue-500 hover:underline'>Login</a>
+                    <Link to=".." className="text-blue-500 hover:underline">Login</Link>
                 </p>
             </section>
             <section className='bg-primary hidden md:flex md:flex-1'>
