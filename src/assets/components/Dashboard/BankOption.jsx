@@ -1,4 +1,14 @@
 import React from 'react';
+/**
+ * 
+ * @param {Object} props
+ * @param {string|number} props.id
+ * @param {string} props.name
+ * @param {string} props.icon 
+ * @param {boolean} props.isChecked
+ * @param {function} props.onChange 
+ * @returns {JSX.Element} 
+ */
 
 const BankOption = ({ id, name, icon, isChecked, onChange }) => {
     return (
