@@ -20,10 +20,10 @@ function HeaderLP() {
         </div>
 
         <div className='hidden md:flex items-center gap-4'>
-          <NavLink to="/login" className={desktopBtnStyle}>
+          <NavLink to="auth" className={desktopBtnStyle}>
             Sign In
           </NavLink>
-          <NavLink to="/register" className={desktopPrimaryBtnStyle}>
+          <NavLink to="auth/register" className={desktopPrimaryBtnStyle}>
             Sign Up
           </NavLink>
         </div>
@@ -48,7 +48,7 @@ function HeaderLP() {
           <NavLink
             to="/register"
             className={mobilePrimaryBtnStyle}
-            onClick={() => setIsOpen(false)} // Tutup menu setelah klik
+            onClick={() => setIsOpen(false)}
           >
             Sign Up
           </NavLink>
