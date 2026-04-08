@@ -5,7 +5,7 @@ import Card from '../components/Dashboard/Card.jsx'
 import IncomeChart from '../components/Dashboard/IncomeChart.jsx'
 import TransactionList from '../components/Dashboard/TransactionList.jsx'
 
-function DashboardP() {
+function Dashboard() {
     return (
         <div className="min-h-screen bg-white">
             {/* Header tetap di atas */}
@@ -90,4 +90,4 @@ function DashboardP() {
     )
 }
 
-export default DashboardP
+export default Dashboard
