@@ -8,22 +8,16 @@ import TransactionList from '../components/Dashboard/TransactionList.jsx'
 function Dashboard() {
     return (
         <div className="min-h-screen bg-white">
-            {/* Header tetap di atas */}
             <Header />
 
             <div className='flex'>
                 <Sidebar />
 
-                {/* Main Content Container */}
                 <main className='flex-1 p-6 md:p-10 bg-white'>
-                    <div className='max-w-7xl mx-auto'>
-                        
-                        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-                            
-                            {/* KOLOM KIRI: Stats, Fast Service, & Chart (2/3 Lebar) */}
-                            <div className='lg:col-span-2 space-y-8'>
-                                
-                                {/* Grid Stats Card */}
+                    <div className='max-w-6xl mx-auto'>
+                        <div className='grid grid-cols-1 xl:grid-cols-3 gap-8'>
+                            <div className='xl:col-span-2 space-y-8'>
+                    
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
                                     <Card
                                         icon='/icons/carddashboard/balance-icon.svg'
@@ -52,8 +46,7 @@ function Dashboard() {
                                     />
                                 </div>
 
-                                {/* Fast Service Section */}
-                                <article className='border-secondary border-2 rounded-2xl bg-white shadow-sm overflow-hidden'>
+                                <article className='border-secondary border-2 rounded-2xl bg-white shadow-sm overflow-y-auto'>
                                     <div className='flex flex-col px-8 py-6 gap-4'>
                                         <h3 className='font-bold text-xl text-gray-800'>Fast Service</h3>
                                         <div className='flex flex-wrap gap-4'>
@@ -69,14 +62,12 @@ function Dashboard() {
                                     </div>
                                 </article>
 
-                                {/* Income Chart Area */}
                                 <div className='bg-white rounded-2xl border-2 border-secondary shadow-sm'>
                                     <IncomeChart />
                                 </div>
                             </div>
 
-                            {/* KOLOM KANAN: Transaction History (1/3 Lebar) */}
-                            <div className='lg:col-span-1'>
+                            <div className='xl:col-span-1 w-full'>
                                 <div className='bg-white rounded-2xl border-2 border-secondary shadow-sm h-full'>
                                     <TransactionList />
                                 </div>
@@ -88,6 +79,6 @@ function Dashboard() {
             </div>
         </div>
     )
-}
+}                               
 
 export default Dashboard
