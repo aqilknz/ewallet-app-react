@@ -1,13 +1,12 @@
-import React, { useRef } from 'react' // 1. Tambahkan useRef
+import React, { useRef } from 'react' 
 import { Link } from "react-router-dom";
-import {ChangeProfile} from '../hooks/ChangeProfile.jsx';
+import {useChangeProfile} from '../hooks/useChangeProfile.jsx';
 import Header from '../components/Dashboard/Header.jsx'
 import Sidebar from '../components/Dashboard/Sidebar.jsx'
 import Input from '../components/Dashboard/Input.jsx'
 
 function Profile() {
-    // 2. Inisialisasi Hook
-    const { preview, error, handleFileChange, handleDelete } = ChangeProfile();
+    const { preview, error, handleFileChange, handleDelete } = useChangeProfile();
     const fileInputRef = useRef(null);
 
     return (
@@ -67,7 +66,6 @@ function Profile() {
                                                     Delete Profile
                                                 </button>
 
-                                                {/* 7. Tampilkan error jika validasi gagal */}
                                                 {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
                                             </div>
                                         </div>

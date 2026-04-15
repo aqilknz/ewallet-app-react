@@ -5,10 +5,17 @@ import AppRoute from './assets/router/AppRoute.jsx'
 import './Global.css'
 // import App from './App.jsx'
 import Login from './assets/pages/Login.jsx'
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
+import { persistor, store } from './assets/redux/store.js'
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <BrowserRouter>
-      <AppRoute />
-    </BrowserRouter>
-  </StrictMode>,
+  // <StrictMode>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+      <BrowserRouter>
+        <AppRoute />
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>
+  // </StrictMode>
 )

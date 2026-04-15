@@ -1,8 +1,8 @@
 import React from 'react'
 import { Routes, Route, Outlet } from 'react-router-dom'
 import { Provider } from "react-redux";
-import { store, persistor } from "../redux/store.js";
-import { PersistGate } from "redux-persist/integration/react";
+// import { store, persistor } from "../redux/store.js";
+// import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from 'react-hot-toast';
 import AuthProtect from '../components/Auth/AuthProtect.jsx';
 import Login from '../pages/Login.jsx'
@@ -25,34 +25,30 @@ import TransferDetail from '../pages/TransferDetail.jsx'
 function AppRoute() {
   return (
     <>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <Toaster position="top-center" reverseOrder={false} />
-          <Routes>
-            <Route path='/' element={<LandingPage />} />
-            <Route path='auth'>
-              <Route index element={<Login />} />
-              <Route path="register" element={<Register />} />
-              <Route path="forgotpassword" element={<ForgotPassword />} />
-              <Route path="enterpin" element={<EnterPin />} />
-            </Route>
-            <Route element={<AuthProtect />}>
-              <Route path='dashboard' element={<Dashboard />} />
-              <Route path='transfer'>
-                <Route index element={<Transfer />} />
-                <Route path='detail' element={<TransferDetail />} />
-              </Route>
-              <Route path='history' element={<History />} />
-              <Route path='topup' element={<TopUpPage />} />
-              <Route path='profile'>
-                <Route index element={<Profile />} />
-                <Route path='changepassword' element={<ChangePassword />} />
-                <Route path='changepin' element={<ChangePin />} />
-              </Route>
-            </Route>
-          </Routes>
-        </PersistGate>
-      </Provider>
+      <Toaster position="top-center" reverseOrder={false} />
+      <Routes>
+        <Route path='/' element={<LandingPage />} />
+        <Route path='auth'>
+          <Route index element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="forgotpassword" element={<ForgotPassword />} />
+          <Route path="enterpin" element={<EnterPin />} />
+        </Route>
+        <Route element={<AuthProtect />}>
+          <Route path='dashboard' element={<Dashboard />} />
+          <Route path='transfer'>
+            <Route index element={<Transfer />} />
+            <Route path='detail' element={<TransferDetail />} />
+          </Route>
+          <Route path='history' element={<History />} />
+          <Route path='topup' element={<TopUpPage />} />
+          <Route path='profile'>
+            <Route index element={<Profile />} />
+            <Route path='changepassword' element={<ChangePassword />} />
+            <Route path='changepin' element={<ChangePin />} />
+          </Route>
+        </Route>
+      </Routes>
     </>
   )
 }
