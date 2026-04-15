@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Joi from 'joi' // Import Joi
+import Joi from 'joi'
+import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux'
+import { registerUser } from '../redux/slice/authSlice.js'
+
 import '../../Global.css'
 import ButtonSubmit from '../components/Auth/ButtonSubmit.jsx'
 import ButtonSignIn from '../components/Auth/ButtonSignIn.jsx'
@@ -8,15 +12,15 @@ import InputForm from '../components/Auth/InputForm.jsx'
 
 function Register() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const [error, setError] = useState('')
-
+    const users = useSelector((state) => state.user.users)
     const [FormData, setFormData] = useState({
         email: '',
         password: '',
         confirmPassword: ''
     })
 
-    // 1. Schema Joi untuk validasi
     const schema = Joi.object({
         email: Joi.string()
             .email({ tlds: { allow: false } })
@@ -43,7 +47,6 @@ function Register() {
             })
     })
 
-    // 2. useEffect untuk memantau perubahan input dan menghapus error
     useEffect(() => {
         if (error) {
             const { error: validationError } = schema.validate(FormData);
@@ -62,28 +65,36 @@ function Register() {
     const handleRegister = (e) => {
         e.preventDefault()
 
-        // 3. Eksekusi validasi Joi
         const { error: validationError } = schema.validate(FormData);
+        const isUserExist = users.find(
+            (user) => user.email === FormData.email
+        )
 
         if (validationError) {
             setError(validationError.details[0].message);
             return;
         }
+        if (isUserExist) {
+            setError('Email sudah terdaftar!')
+            return
+        }
 
-        // Simpan ke localStorage
-        localStorage.setItem('userAccount', JSON.stringify({
+        dispatch(registerUser({
             email: FormData.email,
             password: FormData.password
-        }));
+        }))
 
-        setFormData({
-            email: '',
-            password: '',
-            confirmPassword: ''
-        })
-
-        alert("Registrasi Berhasil!");
-        navigate('/login');
+        // toast.success(`Register Berhasil`);
+        // setFormData({
+        //     email: '',
+        //     password: '',
+        //     confirmPassword: ''
+        // })
+        toast.success(`Register Berhasil`);
+        setTimeout(() => {
+            navigate('/auth');
+        }, 1000);
+        
     }
 
     return (
@@ -97,9 +108,19 @@ function Register() {
                     <h1 className='text-3xl font-semibold'>Start Accessing Banking Needs With All Devices and All Platforms With 30.000+ Users</h1>
                     <p className='text-lg my-1'>Transfering money is eassier than ever, you can access Zwallet wherever you are. Desktop, laptop, mobile phone? we cover all of that for you!</p>
                 </div>
-                <div>
-                    <ButtonSignIn text="Sign In With Google" path="/icons/google.svg" alt="Google" />
-                    <ButtonSignIn text="Sign In With Facebook" path="/icons/facebook.svg" alt="Facebook" />
+                <div className="w-full flex flex-row md:flex-col gap-2">
+                    <ButtonSignIn
+                        text="Sign In With Google"
+                        path="/icons/google.svg"
+                        alt="Google"
+                        className="flex-1"
+                    />
+                    <ButtonSignIn
+                        text="Sign In With Facebook"
+                        path="/icons/facebook.svg"
+                        alt="Facebook"
+                        className="flex-1"
+                    />
                 </div>
                 <div className='flex items-center gap-20 justify-center'>
                     <div className="flex-1 h-px bg-gray-400"></div>
