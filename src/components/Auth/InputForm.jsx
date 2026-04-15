@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import '../../../Global.css'
+import '../../Global.css'
 
 function InputForm({ text, type, placeholder, name, path, onChange, value }) {
     const [showPassword, setShowPassword] = useState(false)

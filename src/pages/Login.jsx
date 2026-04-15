@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { loginSuccess } from '../redux/slice/authSlice.js'
 import Joi from 'joi'
 import toast from 'react-hot-toast';
-import '../../Global.css'
+import '../Global.css'
 import ButtonSubmit from '../components/Auth/ButtonSubmit.jsx'
 import ButtonSignIn from '../components/Auth/ButtonSignIn.jsx'
 import InputForm from '../components/Auth/InputForm.jsx'
@@ -66,7 +66,6 @@ function Login() {
             return;
         }
 
-        // const user = JSON.parse(localStorage.getItem('userAccount'))
         const foundUser = users.find(
             (user) =>
                 user.email === FormData.email &&

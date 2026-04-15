@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'; // Pastikan import dari 'react-router-dom'
-import '../../../Global.css'
+import '../../Global.css'
 
 function HeaderLP() {
   const [isOpen, setIsOpen] = useState(false);

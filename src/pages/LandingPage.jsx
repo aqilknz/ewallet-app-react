@@ -1,5 +1,5 @@
 import React from 'react'
-import '../../Global.css'
+import '../Global.css'
 import HeaderLP from '../components/Landing/HeaderLP.jsx'
 import CardPartners from '../components/Landing/CardPartners.jsx'
 import AboutApp from '../components/Landing/AboutApp.jsx'

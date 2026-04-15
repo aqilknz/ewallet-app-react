@@ -2,7 +2,6 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/slice/authSlice';
-import { persistor } from '../../redux/store';
 
 const Sidebar = () => {
     const dispatch = useDispatch();
@@ -10,7 +9,6 @@ const Sidebar = () => {
 
     const handleLogout = () => {
         dispatch(logout());
-        persistor.purge();
         navigate("/auth", { replace: true });
     };
 

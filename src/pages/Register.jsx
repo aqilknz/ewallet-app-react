@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux'
 import { registerUser } from '../redux/slice/authSlice.js'
 
-import '../../Global.css'
+import '../Global.css'
 import ButtonSubmit from '../components/Auth/ButtonSubmit.jsx'
 import ButtonSignIn from '../components/Auth/ButtonSignIn.jsx'
 import InputForm from '../components/Auth/InputForm.jsx'
