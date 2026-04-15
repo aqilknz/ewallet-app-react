@@ -1,9 +1,19 @@
 import React from 'react'
+import { useSearchParams } from 'react-router-dom'
 import Header from '../components/Dashboard/Header.jsx'
 import Sidebar from '../components/Dashboard/Sidebar.jsx'
 import HistoryList from "../components/Dashboard/HistoryList.jsx"
+import SearchInput from '../components/Dashboard/SearchInput.jsx'
 
 function History() {
+    const [searchParams, setSearchParams] = useSearchParams()
+
+    const search = searchParams.get('search') || ''
+
+    const handleSearch = (e) => {
+        setSearchParams({ search: e.target.value })
+    }
+    const pages = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     return (
         <div className='flex flex-col min-h-screen bg-gray-50'>
             <Header />
@@ -17,41 +27,56 @@ function History() {
                             <h2 className='font-bold text-xl text-gray-800'>History Transaction</h2>
                         </div>
 
-                        <section className='bg-white rounded-2xl shadow-sm border-secondary p-6 md:p-10'>
-                            <div className='flex flex-col md:flex-row justify-between items-center gap-4 mb-8'>
-                                <h3 className='text-lg font-bold text-gray-800'>Find Transaction</h3>
+                        <section className='bg-white rounded-2xl shadow-sm p-6 md:p-10'>
 
-                                <div className='relative w-full md:w-80'>
-                                    <input
-                                        type='text'
-                                        placeholder='Enter Number or Full Name'
-                                        className='w-full pl-4 pr-12 py-3 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-blue-500'
-                                    />
-                                    <div className='absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none'>
-                                        <img src='/icons/Search.svg' alt="Search" className='w-5 h-5' />
-                                    </div>
-                                </div>
+                            <div className='flex flex-col md:flex-row justify-between items-center gap-4 mb-8'>
+                                <h3 className='text-lg font-bold text-gray-800'>
+                                    Find Transaction
+                                </h3>
+
+                                <SearchInput value={search} onChange={handleSearch} />
                             </div>
+
+                            {/* LIST */}
                             <div className='mt-4'>
-                                <HistoryList />
+                                <HistoryList search={search} />
                             </div>
-                            <div className='flex gap-2 w-full text mt-2 flex-wrap'>
-                                <p className='flex flex-1'>Show 5 History of 100 History</p>
-                                <div className='flex gap-4 cursor-pointer overflow-auto'>
-                                    <span>Prev</span>
-                                    <span className='text-primary'>1</span>
-                                    <span>2</span>
-                                    <span>3</span>
-                                    <span>4</span>
-                                    <span>5</span>
-                                    <span>6</span>
-                                    <span>7</span>
-                                    <span>8</span>
-                                    <span>9</span>
-                                    <span>Next</span>
-                                </div>
+
+                            {/* INFO */}
+                            <div className='flex justify-between mt-6 text-sm text-gray-500'>
+                                <p>
+                                    Showing results for: <b>{search || 'All'}</b>
+                                </p>
                             </div>
+
                         </section>
+                        <div className='flex gap-2 w-full text mt-2 flex-wrap items-center'>
+
+                            {/* INFO */}
+                            <p className='flex flex-1 text-sm text-gray-500'>
+                                Show 5 History of 100 History
+                            </p>
+
+                            {/* PAGINATION */}
+                            <div className='flex gap-2 overflow-auto'>
+
+                                <span className='cursor-pointer'>Prev</span>
+
+                                {pages.map((page) => (
+                                    <span
+                                        key={page}
+                                        className={`cursor-pointer px-2 py-1 rounded 
+                                            ${page === 1 ? 'text-primary font-bold' : ''}
+                                            `}
+                                    >
+                                        {page}
+                                    </span>
+                                ))}
+
+                                <span className='cursor-pointer'>Next</span>
+
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>
