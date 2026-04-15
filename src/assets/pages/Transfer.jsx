@@ -1,10 +1,19 @@
 import React from 'react'
+import { useSearchParams } from 'react-router'
 import Header from '../components/Dashboard/Header.jsx'
 import Sidebar from '../components/Dashboard/Sidebar.jsx'
 import TransferList from '../components/Dashboard/TransferList.jsx'
 import TransferStep from '../components/Dashboard/TransferStep.jsx'
+import SearchInput from '../components/Dashboard/SearchInput.jsx'
 
 function Transfer() {
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const search = searchParams.get('search') || ''
+
+  const handleSearch = (e) => {
+    setSearchParams({ search: e.target.value })
+  }
   return (
     <>
 
@@ -19,27 +28,23 @@ function Transfer() {
                 <img src='/icons/Send-b.svg' alt="Transfer" className='w-6 h-6' />
                 <h2 className='font-bold text-xl text-gray-800'>Transfer Money</h2>
               </div>
+              <div className="w-full py-4">
+                <TransferStep currentStep={1} />
+              </div>
 
               <section className='bg-white rounded-2xl shadow-sm border-secondary p-6 md:p-10'>
                 <div className='flex flex-col md:flex-row justify-between items-center gap-4 mb-8'>
                   <h3 className='text-lg font-bold text-gray-800'>Find Transaction</h3>
 
-                  <div className='relative w-full md:w-80'>
-                    <input
-                      type='text'
-                      placeholder='Enter Number or Full Name'
-                      className='w-full pl-4 pr-12 py-3 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-blue-500'
-                    />
-                    <div className='absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none'>
-                      <img src='/icons/Search.svg' alt="Search" className='w-5 h-5' />
-                    </div>
-                  </div>
-                </div>
-                <div>
-
+                  <SearchInput value={search} onChange={handleSearch} />
                 </div>
                 <div className='mt-4'>
-                  <TransferList />
+                  <TransferList search={search} />
+                </div>
+                <div className='flex justify-between mt-6 text-sm text-gray-500'>
+                  <p>
+                    Showing results for: <b>{search || 'All'}</b>
+                  </p>
                 </div>
               </section>
             </div>
