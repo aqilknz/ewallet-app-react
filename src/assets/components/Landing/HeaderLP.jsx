@@ -8,8 +8,8 @@ function HeaderLP() {
   const desktopBtnStyle = 'px-6 py-2 border border-white rounded-lg hover:bg-white hover:text-primary transition-all cursor-pointer inline-block';
   const desktopPrimaryBtnStyle = 'px-6 py-2 bg-white text-primary rounded-lg hover:bg-opacity-90 transition-all cursor-pointer inline-block';
 
-  const mobileBtnStyle = 'w-1/2 px-6 py-2 border border-white rounded-lg cursor-pointer text-center';
-  const mobilePrimaryBtnStyle = 'w-1/2 px-6 py-2 bg-white text-primary rounded-lg font-bold cursor-pointer text-center';
+  const mobileBtnStyle = 'w-5/6 px-6 py-2 border border-white rounded-lg cursor-pointer text-center';
+  const mobilePrimaryBtnStyle = 'w-5/6 px-6 py-2 bg-white text-primary rounded-lg font-bold cursor-pointer text-center';
 
   return (
     <header className='bg-primary text-white relative'>
@@ -39,7 +39,7 @@ function HeaderLP() {
       {isOpen && (
         <div className='md:hidden absolute w-full bg-primary border-t border-blue-400 flex flex-col items-center gap-4 py-5 z-50 shadow-xl'>
           <NavLink
-            to="/login"
+            to="/auth"
             className={mobileBtnStyle}
             onClick={() => setIsOpen(false)}
           >
