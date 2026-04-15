@@ -1,44 +1,47 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Joi from 'joi' // Import Joi
+import { useSelector, useDispatch } from 'react-redux'
+import { loginSuccess } from '../redux/slice/authSlice.js'
+import Joi from 'joi'
+import toast from 'react-hot-toast';
 import '../../Global.css'
 import ButtonSubmit from '../components/Auth/ButtonSubmit.jsx'
 import ButtonSignIn from '../components/Auth/ButtonSignIn.jsx'
 import InputForm from '../components/Auth/InputForm.jsx'
 
+const schema = Joi.object({
+    email: Joi.string()
+        .email({ tlds: { allow: false } })
+        .required()
+        .messages({
+            'string.empty': 'Email dan Password wajib diisi!',
+            'string.email': 'Format email tidak valid!',
+            'any.required': 'Email dan Password wajib diisi!'
+        }),
+    password: Joi.string()
+        .min(8)
+        .required()
+        .messages({
+            'string.empty': 'Email dan Password wajib diisi!',
+            'string.min': 'Password minimal harus 8 karakter!',
+            'any.required': 'Email dan Password wajib diisi!'
+        })
+})
+
 function Login() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+
+    const users = useSelector((state) => state.user.users)
     const [error, setError] = useState('')
     const [FormData, setFormData] = useState({
         email: '',
         password: ''
     })
 
-    // 1. Schema Joi untuk validasi Login
-    const schema = Joi.object({
-        email: Joi.string()
-            .email({ tlds: { allow: false } })
-            .required()
-            .messages({
-                'string.empty': 'Email dan Password wajib diisi!',
-                'string.email': 'Format email tidak valid!',
-                'any.required': 'Email dan Password wajib diisi!'
-            }),
-        password: Joi.string()
-            .min(8)
-            .required()
-            .messages({
-                'string.empty': 'Email dan Password wajib diisi!',
-                'string.min': 'Password minimal harus 8 karakter!',
-                'any.required': 'Email dan Password wajib diisi!'
-            })
-    })
-
-    // 2. useEffect untuk validasi real-time (menghapus error saat user mengetik dengan benar)
     useEffect(() => {
         if (error) {
             const { error: validationError } = schema.validate(FormData);
-            // Hanya hapus error jika Joi menyatakan input sudah valid secara format
             if (!validationError) {
                 setError('');
             }
@@ -56,7 +59,6 @@ function Login() {
     const handleLogin = (e) => {
         e.preventDefault()
 
-        // 3. Validasi Format dengan Joi
         const { error: validationError } = schema.validate(FormData);
 
         if (validationError) {
@@ -64,20 +66,23 @@ function Login() {
             return;
         }
 
-        // 4. Logika Autentikasi LocalStorage
-        const user = JSON.parse(localStorage.getItem('userAccount'))
-
-        if (!user) {
-            setError('Akun tidak ditemukan, silahkan Register terlebih dahulu!')
+        // const user = JSON.parse(localStorage.getItem('userAccount'))
+        const foundUser = users.find(
+            (user) =>
+                user.email === FormData.email &&
+                user.password === FormData.password
+        )
+        if (!foundUser) {
+            setError('Email dan Password salah!')
             return
         }
 
-        if (FormData.email === user.email && FormData.password === user.password) {
-            alert("Login Berhasil!");
+        dispatch(loginSuccess(foundUser))
+        toast.success(`Login Berhasil`);
+        setTimeout(() => {
             navigate('/dashboard');
-        } else {
-            setError('Email dan Password salah!')
-        }
+        }, 1000);
+        
     }
 
     return (
@@ -91,9 +96,19 @@ function Login() {
                     <h1 className='text-4xl font-semibold'>Hello Welcome Back 👋</h1>
                     <p className='text-lg my-2'>Fill out the form correctly or you can login with several options.</p>
                 </div>
-                <div>
-                    <ButtonSignIn text="Sign In With Google" path="/icons/google.svg" alt="Google" />
-                    <ButtonSignIn text="Sign In With Facebook" path="/icons/facebook.svg" alt="Facebook" />
+                <div className="w-full flex flex-row md:flex-col gap-2">
+                    <ButtonSignIn
+                        text="Sign In With Google"
+                        path="/icons/google.svg"
+                        alt="Google"
+                        className="flex-1"
+                    />
+                    <ButtonSignIn
+                        text="Sign In With Facebook"
+                        path="/icons/facebook.svg"
+                        alt="Facebook"
+                        className="flex-1"
+                    />
                 </div>
                 <div className='flex items-center gap-20 justify-center'>
                     <div className="flex-1 h-px bg-gray-400"></div>
@@ -112,6 +127,11 @@ function Login() {
                     </div>
                     <ButtonSubmit label="Login" />
                 </form>
+                <p className='text-right text-gray-500 text-sm'>
+                    <Link to="forgotpassword" className="text-black hover:text-primary hover:underline">
+                        Forgot Password?
+                    </Link>
+                </p>
                 <p className='text-center text-gray-500 text-sm'>
                     <span>Not Have An Account? </span>
                     <Link to="register" className="text-blue-500 hover:underline">
