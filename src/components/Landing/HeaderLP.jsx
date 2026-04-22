@@ -46,7 +46,7 @@ function HeaderLP() {
             Sign In
           </NavLink>
           <NavLink
-            to="/register"
+            to="auth/register"
             className={mobilePrimaryBtnStyle}
             onClick={() => setIsOpen(false)}
           >
