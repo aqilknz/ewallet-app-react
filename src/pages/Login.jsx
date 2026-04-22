@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { loginSuccess } from '../redux/slice/authSlice.js'
+import { loginSuccess, loginFailed } from '../redux/slice/authSlice.js'
 import Joi from 'joi'
 import toast from 'react-hot-toast';
 import '../Global.css'
@@ -31,8 +31,7 @@ const schema = Joi.object({
 function Login() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-
-    const users = useSelector((state) => state.user.users)
+    const { users } = useSelector((state) => state.register) 
     const [error, setError] = useState('')
     const [FormData, setFormData] = useState({
         email: '',
@@ -42,9 +41,7 @@ function Login() {
     useEffect(() => {
         if (error) {
             const { error: validationError } = schema.validate(FormData);
-            if (!validationError) {
-                setError('');
-            }
+            if (!validationError) setError('');
         }
     }, [FormData]);
 
@@ -58,7 +55,6 @@ function Login() {
 
     const handleLogin = (e) => {
         e.preventDefault()
-
         const { error: validationError } = schema.validate(FormData);
 
         if (validationError) {
@@ -71,21 +67,33 @@ function Login() {
                 user.email === FormData.email &&
                 user.password === FormData.password
         )
+
         if (!foundUser) {
             setError('Email dan Password salah!')
+            dispatch(loginFailed('Invalid Credentials'))
             return
         }
 
-        dispatch(loginSuccess(foundUser))
-        toast.success(`Login Berhasil`);
-        setTimeout(() => {
-            navigate('/dashboard');
-        }, 1000);
-        
+        if (!foundUser.pin) {
+   
+            dispatch(loginSuccess(foundUser));
+            toast.success(`Login berhasil, silakan buat PIN keamanan Anda`);
+            setTimeout(() => {
+                navigate('/auth/enterpin');
+            }, 1000);
+        } else {
+
+            dispatch(loginSuccess(foundUser));
+            toast.success(`Selamat Datang Kembali!`);
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 1000);
+        }
     }
 
     return (
         <div className='flex min-h-screen md:bg-primary '>
+
             <section className='flex flex-1 bg-white justify-center flex-col px-20 py-8 md:rounded-r-4xl gap-2'>
                 <header className='flex items-center gap-2'>
                     <img src='/icons/logo.svg' alt='E-Wallet Logo' className='w-10 h-10' />
@@ -93,7 +101,7 @@ function Login() {
                 </header>
                 <div>
                     <h1 className='text-4xl font-semibold'>Hello Welcome Back 👋</h1>
-                    <p className='text-lg my-2'>Fill out the form correctly or you can login with several options.</p>
+                    <p className='text-lg my-2 text-gray-600'>Fill out the form correctly or you can login with several options.</p>
                 </div>
                 <div className="w-full flex flex-row md:flex-col gap-2">
                     <ButtonSignIn
@@ -127,7 +135,7 @@ function Login() {
                     <ButtonSubmit label="Login" />
                 </form>
                 <p className='text-right text-gray-500 text-sm'>
-                    <Link to="forgotpassword" className="text-black hover:text-primary hover:underline">
+                    <Link to="forgotpassword" title="Forgot Password" className="text-black hover:text-primary hover:underline">
                         Forgot Password?
                     </Link>
                 </p>
@@ -139,7 +147,7 @@ function Login() {
                 </p>
             </section>
             <section className='hidden md:flex md:flex-1'>
-                <img src='/icons/right-login.svg' alt='Google' />
+                <img src='/icons/right-login.svg' alt='Illustration' />
             </section>
         </div>
     )
