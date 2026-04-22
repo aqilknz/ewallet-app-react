@@ -1,14 +1,14 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { logout } from '../../redux/slice/authSlice';
+import { logoutUser } from '../../redux/slice/authSlice';
 
 const Sidebar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        dispatch(logout());
+        dispatch(logoutUser());
         navigate("/auth", { replace: true });
     };
 
