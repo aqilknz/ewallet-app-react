@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from 'react-router'
-import { logout } from '../../redux/slice/authSlice';
+import { logoutUser } from '../../redux/slice/authSlice';
 import { useDispatch } from "react-redux";
-import { persistor } from '../../redux/store';
 
 function Header() {
-    const currentUser = useSelector((state)=>state.user.currentUser)
+    const { currentUser } = useSelector((state) => state.auth);
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate()
     const dispatch = useDispatch()
     function handleLogout() {
-        dispatch(logout())
-        persistor.purge();
+        dispatch(logoutUser())
         navigate("/auth", { replace: true });
     }
 
@@ -30,11 +28,11 @@ function Header() {
                         className='flex items-center cursor-pointer gap-2 hover:bg-gray-50 p-2 rounded-xl transition-all'
                         onClick={() => setIsOpen(!isOpen)}
                     >
-                        <span>{currentUser?.email || "Guest"}</span>
-                        <img src='/images/Ghaluh icon.svg' className='w-10 h-10 rounded-full object-cover' alt="User" />
+                        <span className='hidden md:block'>{currentUser?.email || "Guest"}</span>
+                        <img src={currentUser?.avatar} className='w-10 h-10 rounded-full object-cover' alt="User" />
                         <img
                             src='/icons/down.svg'
-                            className={`w-6 h-6 transition-transform duration-300 ${isOpen ? 'md:rotate-180' : ''}`}
+                            className={`w-6 h-6 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
                             alt="Arrow"
                         />
                     </div>
@@ -42,6 +40,7 @@ function Header() {
                     {isOpen && (
                         <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl py-3 z-10 md:hidden">
                             <div className="px-2 space-y-1">
+                                <span className='block text-sm font-bold text-gray-700 text-center py-2'>{currentUser?.email || "Guest"}</span>
                                 <Link to="/dashboard"
                                     className="block px-3 py-2 text-sm text-gray-700 hover:bg-primary hover:text-white rounded-lg transition">
                                     Dashboard
