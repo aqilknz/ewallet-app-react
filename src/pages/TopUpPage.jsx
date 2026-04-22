@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { setPendingTransaction } from '../redux/slice/transactionSlice'; // Pastikan slice ini sudah ada
+import toast from 'react-hot-toast';
 import BankOption from '../components/Dashboard/BankOption';
 import Header from '../components/Dashboard/Header';
 import Sidebar from '../components/Dashboard/Sidebar';
 
 const TopUpPage = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { currentUser } = useSelector((state) => state.auth);
+
     const [selectedBank, setSelectedBank] = useState('bri');
     const [amount, setAmount] = useState('');
+
+    const nominal = Number(amount) || 0;
+    const tax = nominal > 0 ? 4000 : 0;
+    const total = nominal + tax;
 
     const bankOpt = [
         { id: 'bri', name: 'Bank Rakyat Indonesia', icon: '/icons/bank/bri.svg' },
@@ -14,6 +26,20 @@ const TopUpPage = () => {
         { id: 'gopay', name: 'Gopay', icon: '/icons/bank/gopay.svg' },
         { id: 'ovo', name: 'OVO', icon: '/icons/bank/ovo.svg' },
     ];
+
+    const handleTopUpSubmit = () => {
+        if (nominal < 10000) return toast.error("Minimal Top Up Rp 10.000");
+
+        dispatch(setPendingTransaction({
+            type: 'topup',
+            amount: nominal,
+            total: total,
+            bank: selectedBank
+        }));
+
+        toast.loading("Menuju verifikasi PIN...", { duration: 1000 });
+        setTimeout(() => navigate('/auth/enterpin'), 1000);
+    };
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
@@ -31,27 +57,22 @@ const TopUpPage = () => {
                             <section className="w-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col gap-8 md:p-10">
 
                                 <div>
-                                    <h3 className="font-semibold text-lg text-gray-900 mb-3 block">
-                                        Account Information
-                                    </h3>
-
+                                    <h3 className="font-semibold text-lg text-gray-900 mb-3 block">Account Information</h3>
                                     <div className="bg-gray-50 p-4 rounded-xl flex items-center gap-5">
-                                        <img src="/images/Profile.svg" alt="profile"
-                                            className="w-14 h-14 rounded-lg object-cover" />
+                                        <img src="/images/Profile.svg" alt="profile" className="w-14 h-14 rounded-lg object-cover" />
                                         <div className="flex flex-col gap-1">
-                                            <strong className="text-sm text-gray-800">Ghaluh Wizard</strong>
-                                            <span className="text-xs text-gray-500">(239) 555-0108</span>
+                                            <strong className="text-sm text-gray-800">{currentUser?.fullName}</strong>
+                                            <span className="text-xs text-gray-500">{currentUser?.phone}</span>
                                             <span className="bg-blue-600 text-white px-2 py-1 rounded-md text-[10px] inline-flex items-center gap-1 w-fit">
-                                                <img src="/icons/verified.svg" alt="verified" className="w-4 h-4" />
-                                                Verified
+                                                <img src="/icons/verified.svg" alt="verified" className="w-4 h-4" /> Verified
                                             </span>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div>
                                     <label className="font-semibold text-lg text-gray-900 mb-1 block">Amount</label>
                                     <p className="text-sm text-gray-400 mb-3">Type the amount you want to transfer</p>
-
                                     <div className="relative">
                                         <img src="/icons/money.svg" className="absolute left-4 top-3.5 w-5 opacity-60" />
                                         <input
@@ -67,7 +88,6 @@ const TopUpPage = () => {
                                 <div>
                                     <label className="font-semibold text-lg text-gray-900 mb-1 block">Payment Method</label>
                                     <p className="text-sm text-gray-400 mb-4">Choose your payment method</p>
-
                                     <div className="flex flex-col gap-3">
                                         {bankOpt.map((bank) => (
                                             <BankOption
@@ -82,13 +102,11 @@ const TopUpPage = () => {
                             </section>
 
                             <section className="w-full lg:w-[320px] xl:w-[350px] bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex-shrink-0 sticky top-8">
-
                                 <h3 className="font-semibold text-lg text-gray-900 mb-6">Payment</h3>
-
                                 <div className="flex flex-col gap-4 mb-6">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-500">Order</span>
-                                        <strong className="text-gray-800">Idr. 40.000</strong>
+                                        <strong className="text-gray-800">Idr. {nominal.toLocaleString()}</strong>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-500">Delivery</span>
@@ -96,18 +114,19 @@ const TopUpPage = () => {
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-gray-500">Tax</span>
-                                        <strong className="text-gray-800">Idr. 4.000</strong>
+                                        <strong className="text-gray-800">Idr. {tax.toLocaleString()}</strong>
                                     </div>
-
                                     <hr className="border-gray-200" />
-
                                     <div className="flex justify-between text-base font-bold text-gray-900">
                                         <span>Sub Total</span>
-                                        <span>Idr. 44.000</span>
+                                        <span>Idr. {total.toLocaleString()}</span>
                                     </div>
                                 </div>
 
-                                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition">
+                                <button
+                                    onClick={handleTopUpSubmit}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition"
+                                >
                                     Submit
                                 </button>
 
@@ -115,7 +134,6 @@ const TopUpPage = () => {
                                     *Get Discount if you pay with Bank Central Asia
                                 </p>
                             </section>
-
                         </div>
                     </div>
                 </main>
