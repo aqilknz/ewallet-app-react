@@ -12,7 +12,10 @@ function Transfer() {
   const search = searchParams.get('search') || ''
 
   const handleSearch = (e) => {
-    setSearchParams({ search: e.target.value })
+    setSearchParams({
+      search: e.target.value,
+      page: 1
+    })
   }
   return (
     <>
@@ -39,13 +42,22 @@ function Transfer() {
                   <SearchInput value={search} onChange={handleSearch} />
                 </div>
                 <div className='mt-4'>
-                  <TransferList search={search} />
+                  <TransferList />
                 </div>
-                <div className='flex justify-between mt-6 text-sm text-gray-500'>
+                <div>
+                  {search && (
+                    <div className='mt-6 text-sm text-gray-500'>
+                      <p>
+                        Showing results for: <span className="font-bold text-primary italic">"{search}"</span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {/* <div className='flex justify-between mt-6 text-sm text-gray-500'>
                   <p>
                     Showing results for: <b>{search || 'All'}</b>
                   </p>
-                </div>
+                </div> */}
               </section>
             </div>
           </main>
