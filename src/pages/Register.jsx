@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Joi from 'joi'
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux'
-import { registerUser } from '../redux/slice/authSlice.js'
+import { registerStart, registerSuccess, registerFailed } from '../redux/slice/registerSlice.js'
 
 import '../Global.css'
 import ButtonSubmit from '../components/Auth/ButtonSubmit.jsx'
@@ -14,7 +14,7 @@ function Register() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const [error, setError] = useState('')
-    const users = useSelector((state) => state.user.users)
+    const { users, isLoading } = useSelector((state) => state.register);
     const [FormData, setFormData] = useState({
         email: '',
         password: '',
@@ -47,13 +47,6 @@ function Register() {
             })
     })
 
-    useEffect(() => {
-        if (error) {
-            const { error: validationError } = schema.validate(FormData);
-            if (!validationError) setError('');
-        }
-    }, [FormData]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -64,6 +57,7 @@ function Register() {
 
     const handleRegister = (e) => {
         e.preventDefault()
+        dispatch(registerStart());
 
         const { error: validationError } = schema.validate(FormData);
         const isUserExist = users.find(
@@ -72,29 +66,25 @@ function Register() {
 
         if (validationError) {
             setError(validationError.details[0].message);
+            dispatch(registerFailed(validationError.details[0].message));
             return;
         }
         if (isUserExist) {
             setError('Email sudah terdaftar!')
+            dispatch(registerFailed('Email sudah terdaftar!'));
             return
         }
 
-        dispatch(registerUser({
+        dispatch(registerSuccess({
+            username: FormData.email,
             email: FormData.email,
-            password: FormData.password
-        }))
+            password: FormData.password,
+        }));
 
-        // toast.success(`Register Berhasil`);
-        // setFormData({
-        //     email: '',
-        //     password: '',
-        //     confirmPassword: ''
-        // })
         toast.success(`Register Berhasil`);
         setTimeout(() => {
             navigate('/auth');
         }, 1000);
-        
     }
 
     return (
