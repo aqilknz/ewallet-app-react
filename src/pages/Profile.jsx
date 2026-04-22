@@ -1,14 +1,55 @@
-import React, { useRef } from 'react' 
-import { Link } from "react-router-dom";
-import {useChangeProfile} from '../hooks/useChangeProfile.jsx';
+import React, { useRef, useState } from 'react' 
+import { Link,useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { useChangeProfile } from '../hooks/useChangeProfile.jsx';
+import { updateUserProfile } from '../redux/slice/registerSlice.js';
+import { loginSuccess } from '../redux/slice/authSlice.js';
+import toast from 'react-hot-toast';
 import Header from '../components/Dashboard/Header.jsx'
 import Sidebar from '../components/Dashboard/Sidebar.jsx'
 import Input from '../components/Dashboard/Input.jsx'
 
 function Profile() {
+    const dispatch = useDispatch();
+    const { currentUser } = useSelector((state) => state.auth);
+    
     const { preview, error, handleFileChange, handleDelete } = useChangeProfile();
     const fileInputRef = useRef(null);
 
+    const [formData, setFormData] = useState({
+        fullName: currentUser?.fullName || "",
+        phone: currentUser?.phone || "",
+    });
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleUpdateProfile = (e) => {
+    e.preventDefault();
+    
+    const updatedData = {
+        username: currentUser.email,
+        fullName: formData.fullName,
+        phone: formData.phone,
+        avatar: preview || currentUser.avatar 
+    };
+
+    dispatch(updateUserProfile(updatedData));
+    dispatch(loginSuccess({
+        ...currentUser,
+        ...updatedData
+    }));
+
+    toast.success("Profile updated successfully!");
+
+    setFormData({
+        fullName: updatedData.fullName,
+        phone: updatedData.phone,
+        email: currentUser.email
+    });
+};
     return (
         <>
             <div className='flex flex-col min-h-screen bg-gray-50'>
@@ -24,7 +65,10 @@ function Profile() {
                             </div>
 
                             <section className="flex flex-col lg:flex-row gap-2 items-start">
-                                <div className="w-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col gap-2 md:p-10">
+                                <form 
+                                    onSubmit={handleUpdateProfile}
+                                    className="w-full bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col gap-2 md:p-10"
+                                >
                                     <div className="mb-6 ">
                                         <h3 className="font-semibold text-lg text-gray-900 mb-3 block">
                                             Profile Picture
@@ -33,9 +77,9 @@ function Profile() {
                                         <div className="flex items-center gap-5">
                                             <div className="w-[100px] h-[100px] bg-gray-100 border rounded-xl flex items-center justify-center overflow-hidden">
                                                 <img
-                                                    src={preview}
+                                                    src={preview || currentUser?.avatar}
                                                     alt="avatar"
-                                                    className={preview.includes('User.svg') ? "w-16" : "w-full h-full object-cover"}
+                                                    className={(!preview && !currentUser?.avatar) ? "w-16" : "w-full h-full object-cover"}
                                                 />
                                             </div>
 
@@ -75,14 +119,15 @@ function Profile() {
                                         </p>
                                     </div>
 
-                                    {/* Form Input lainnya tetap sama */}
                                     <div className='my-2'>
                                         <Input
-                                            name="fullname"
+                                            name="fullName"
                                             text="Full Name"
                                             path="/icons/Profile/user-input.svg"
                                             type="text"
                                             placeholder="Enter Full Name"
+                                            value={formData.fullName}
+                                            onChange={handleInputChange}
                                         />
                                     </div>
                                     <div className='my-2'>
@@ -92,6 +137,8 @@ function Profile() {
                                             path="/icons/Profile/Phone.svg"
                                             type="text"
                                             placeholder="Enter Phone Number"
+                                            value={formData.phone}
+                                            onChange={handleInputChange}
                                         />
                                     </div>
                                     <div className='my-2'>
@@ -101,6 +148,9 @@ function Profile() {
                                             path="/icons/Profile/mail.svg"
                                             type="text"
                                             placeholder="Enter Email Address"
+                                            value={currentUser?.email || ""}
+                                            disabled={true}
+                                            readOnly={true}
                                         />
                                     </div>
 
@@ -126,7 +176,7 @@ function Profile() {
                                     >
                                         Submit
                                     </button>
-                                </div>
+                                </form>
                             </section>
                         </div>
                     </main>
@@ -136,4 +186,4 @@ function Profile() {
     )
 }
 
-export default Profile
+export default Profile;
