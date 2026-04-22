@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import Header from '../components/Dashboard/Header.jsx'
 import Sidebar from '../components/Dashboard/Sidebar.jsx'
 import Card from '../components/Dashboard/Card.jsx'
@@ -6,6 +7,15 @@ import IncomeChart from '../components/Dashboard/IncomeChart.jsx'
 import TransactionList from '../components/Dashboard/TransactionList.jsx'
 
 function Dashboard() {
+    const { currentUser } = useSelector((state) => state.auth);
+
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+        }).format(value || 0).replace('IDR', 'Rp.');
+    };
     return (
         <div className="min-h-screen bg-white">
             <Header />
@@ -22,7 +32,7 @@ function Dashboard() {
                                     <Card
                                         icon='/icons/carddashboard/balance-icon.svg'
                                         text='Balance'
-                                        money='Rp. 120.000'
+                                        money={formatCurrency(currentUser?.balance)}
                                         persen='+2%'
                                         updown='/icons/carddashboard/rise-icons.svg'
                                         opt='3 days ago'
@@ -31,7 +41,7 @@ function Dashboard() {
                                     <Card
                                         icon='/icons/carddashboard/income-icon.svg'
                                         text='Income'
-                                        money='Rp. 2.120.000'
+                                        money={formatCurrency(currentUser?.income)}
                                         persen='+2%'
                                         updown='/icons/carddashboard/rise-icons.svg'
                                         color='text-green-500'
@@ -39,7 +49,7 @@ function Dashboard() {
                                     <Card
                                         icon='/icons/carddashboard/expense-icon.svg'
                                         text='Expense'
-                                        money='Rp. 220.000'
+                                        money={formatCurrency(currentUser?.expense)}
                                         persen='+2%'
                                         updown='/icons/carddashboard/set-icon.svg'
                                         color='text-red-500'
