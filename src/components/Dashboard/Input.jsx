@@ -1,6 +1,6 @@
 import React from 'react'
 
-function Input({name, text, path, type, value, onChange,placeholder}) {
+function Input({ name, text, path, type, value, onChange, placeholder,disabled,readOnly }) {
     return (
         <div className='flex flex-col gap-2'>
             <label htmlFor={name} className='font-2xl'>{text}</label>
@@ -14,6 +14,8 @@ function Input({name, text, path, type, value, onChange,placeholder}) {
                     value={value}
                     onChange={onChange}
                     placeholder={placeholder}
+                    disabled={disabled} 
+                    readOnly={readOnly}
                     className='border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 px-2 py-2 w-full pl-10 pr-10 bg-transparent autofill:shadow-[inset_0_0_0px_1000px_white]'
                 />
 
