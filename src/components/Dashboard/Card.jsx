@@ -16,7 +16,7 @@ import React from 'react'
 function Card({icon, text, money, persen, updown, opt, color}) {
   return (
     <article className='border-secondary border-2 rounded-xl bg-white'>
-        <div className='flex flex-col px-10 py-5 gap-2'>
+        <div className='flex flex-col px-5 py-5 gap-2'>
             <div className='flex gap-2'>
                 <img src={icon} alt={text}/>
                 <span>{text}</span>
