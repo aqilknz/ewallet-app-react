@@ -1,0 +1,21 @@
+
+FROM ubuntu:latest
+
+RUN apt-get update && apt-get install -y openssh-server sudo && mkdir /var/run/sshd
+
+RUN useradd -m -s /bin/bash aqilknz
+RUN mkdir -p /home/aqilknz/.ssh
+RUN chmod 700 /home/aqilknz/.ssh
+
+COPY ssh/id_rsa_aqilknz.pub /home/aqilknz/.ssh/authorized_keys
+
+RUN chown -R aqilknz:aqilknz /home/aqilknz/.ssh
+RUN chmod 600 /home/aqilknz/.ssh/authorized_keys
+
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+RUN echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
