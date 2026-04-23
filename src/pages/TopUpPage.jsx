@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setPendingTransaction } from '../redux/slice/transactionSlice'; // Pastikan slice ini sudah ada
+import { setPendingTransaction } from '../redux/slice/transactionSlice';
+import { updateUserBalance } from '../redux/slice/registerSlice';
+import { loginSuccess } from '../redux/slice/authSlice';
 import toast from 'react-hot-toast';
 import BankOption from '../components/Dashboard/BankOption';
 import Header from '../components/Dashboard/Header';
@@ -12,7 +14,7 @@ const TopUpPage = () => {
     const navigate = useNavigate();
     const { currentUser } = useSelector((state) => state.auth);
 
-    const [selectedBank, setSelectedBank] = useState('bri');
+    const [selectedBank, setSelectedBank] = useState('');
     const [amount, setAmount] = useState('');
 
     const nominal = Number(amount) || 0;
@@ -30,6 +32,16 @@ const TopUpPage = () => {
     const handleTopUpSubmit = () => {
         if (nominal < 10000) return toast.error("Minimal Top Up Rp 10.000");
 
+        dispatch(updateUserBalance({
+            username: currentUser.email,
+            amount: nominal,
+            type: 'topup'
+        }));
+        dispatch(loginSuccess({
+            ...currentUser,
+            balance: (currentUser.balance || 0) + nominal,
+            income: (currentUser.income || 0) + nominal
+        }));
         dispatch(setPendingTransaction({
             type: 'topup',
             amount: nominal,
@@ -37,8 +49,15 @@ const TopUpPage = () => {
             bank: selectedBank
         }));
 
-        toast.loading("Menuju verifikasi PIN...", { duration: 1000 });
-        setTimeout(() => navigate('/auth/enterpin'), 1000);
+        // toast.loading("Menuju verifikasi PIN...", { duration: 1000 });
+        toast.success("Top Up successfully!", { duration: 1000 });
+        // dispatch(clearPendingTransaction({
+
+        // }))
+        setAmount('')
+        setSelectedBank('')
+
+        setTimeout(() => navigate('/topup'), 1000);
     };
 
     return (
@@ -59,7 +78,7 @@ const TopUpPage = () => {
                                 <div>
                                     <h3 className="font-semibold text-lg text-gray-900 mb-3 block">Account Information</h3>
                                     <div className="bg-gray-50 p-4 rounded-xl flex items-center gap-5">
-                                        <img src="/images/Profile.svg" alt="profile" className="w-14 h-14 rounded-lg object-cover" />
+                                        <img src={currentUser?.avatar} alt="profile" className="w-14 h-14 rounded-lg object-cover" />
                                         <div className="flex flex-col gap-1">
                                             <strong className="text-sm text-gray-800">{currentUser?.fullName}</strong>
                                             <span className="text-xs text-gray-500">{currentUser?.phone}</span>
