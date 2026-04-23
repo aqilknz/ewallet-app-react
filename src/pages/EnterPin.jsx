@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { savePinToUser, updateUserBalance } from '../redux/slice/registerSlice';
+import { savePinToUser } from '../redux/slice/registerSlice';
 import { loginSuccess } from '../redux/slice/authSlice';
-import { clearPendingTransaction } from '../redux/slice/transactionSlice'; 
 import { usePinLogic } from '../hooks/usePinLogic';
 import toast from "react-hot-toast";
 
@@ -29,36 +28,11 @@ function EnterPin() {
             return toast.error("Silakan isi PIN 6 digit secara lengkap");
         }
 
-        if (pendingTransaction) {
-            if (pinString === currentUser.pin) {
-                dispatch(updateUserBalance({
-                    username: currentUser.email,
-                    amount: Number(pendingTransaction.amount),
-                    type: 'topup'
-                }));
-
-                dispatch(loginSuccess({
-                    ...currentUser,
-                    balance: (currentUser.balance || 0) + Number(pendingTransaction.amount),
-                    income: (currentUser.income || 0) + Number(pendingTransaction.amount)
-                }));
-
-                dispatch(clearPendingTransaction());
-
-                toast.success(`Transaksi Berhasil! Saldo ditambahkan.`);
-                return navigate("/dashboard");
-            } else {
-                toast.error("PIN salah! Silakan coba lagi.");
-                return;
-            }
-        }
-
         const userKey = currentUser.username || currentUser.email;
         dispatch(savePinToUser({ username: userKey, pin: pinString }));
         dispatch(loginSuccess({ ...currentUser, pin: pinString }));
 
         toast.success("PIN Berhasil disetel!");
-        dispatch(clearPendingTransaction());
         setTimeout(() => navigate("/dashboard"), 1000);
     };
 
