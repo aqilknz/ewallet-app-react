@@ -9,23 +9,21 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import storage from "redux-persist/es/storage"; // Import yang lebih standar
+import storage from "redux-persist/es/storage";
 import authReducer from "./slice/authSlice";
 import registerReducer from "./slice/registerSlice";
 import transactionReducer from "./slice/transactionSlice"
 
-// Konfigurasi untuk Sesi Login (Sangat penting agar user tidak perlu login ulang)
 export const authPersistConfig = {
     key: "authSession",
     storage,
-    whitelist: ['currentUser', 'isAuthenticated'] // Hanya simpan data login utama
+    whitelist: ['currentUser', 'isAuthenticated'] 
 };
 
-// Konfigurasi untuk Database User (Poin a.i: List akun yang didaftarkan)
 export const registerPersistConfig = {
     key: "registerSession",
     storage,
-    whitelist: ['users'] // HANYA simpan daftar users, abaikan error/loading
+    whitelist: ['users'] 
 };
 
 const rootReducer = combineReducers({
@@ -39,7 +37,7 @@ export const store = configureStore({
     middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Abaikan pengecekan serializable untuk action bawaan redux-persist
+
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
