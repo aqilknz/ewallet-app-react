@@ -9,11 +9,11 @@ const transactionSlice = createSlice({
     setPendingTransaction: (state, action) => {
       state.pendingTransaction = action.payload;
     },
-    pendingTransaction: (state) => {
+    clearPendingTransaction: (state) => {
       state.pendingTransaction = null;
     },
   },
 });
 
-export const { setPendingTransaction, pendingTransaction } = transactionSlice.actions;
+export const { setPendingTransaction, clearPendingTransaction } = transactionSlice.actions;
 export default transactionSlice.reducer;
