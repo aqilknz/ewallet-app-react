@@ -8,9 +8,7 @@ import { DataTransfer } from '../components/Dashboard/data/DataTransfer'
 
 function TransferDetail() {
   const [searchParams] = useSearchParams()
-  const id = searchParams.get('id') // Ambil ID dari URL (?id=1)
-
-  // Cari data user yang cocok dengan ID dari URL
+  const id = searchParams.get('id')
   const selectedUser = DataTransfer.find(u => u.id === parseInt(id))
   console.log("ID dari URL:", id);
   console.log("User yang ditemukan:", selectedUser);
@@ -34,7 +32,6 @@ function TransferDetail() {
               <TransferStep currentStep={2} />
             </div>
             <section>
-              {/* Kirim data selectedUser sebagai prop ke DetailTransfer */}
               <DetailTransfer user={selectedUser} />
             </section>
           </div>
