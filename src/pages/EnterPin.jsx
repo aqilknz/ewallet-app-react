@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { savePinToUser, updateUserBalance } from '../redux/slice/registerSlice';
 import { loginSuccess } from '../redux/slice/authSlice';
-import { pendingTransaction } from '../redux/slice/transactionSlice'; 
+import { clearPendingTransaction } from '../redux/slice/transactionSlice'; 
 import { usePinLogic } from '../hooks/usePinLogic';
 import toast from "react-hot-toast";
 
@@ -58,6 +58,7 @@ function EnterPin() {
         dispatch(loginSuccess({ ...currentUser, pin: pinString }));
 
         toast.success("PIN Berhasil disetel!");
+        dispatch(clearPendingTransaction());
         setTimeout(() => navigate("/dashboard"), 1000);
     };
 
