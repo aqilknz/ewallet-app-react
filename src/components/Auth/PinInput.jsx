@@ -31,7 +31,8 @@ const PinInput = ({ length = 6, onComplete }) => {
             {pin.map((data, index) => (
                 <input
                     key={index}
-                    type="text"
+                    type="password"
+                    inputMode="numeric"
                     maxLength="1"
                     ref={(el) => (inputRefs.current[index] = el)}
                     value={data}
