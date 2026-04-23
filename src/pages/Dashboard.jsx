@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import Header from '../components/Dashboard/Header.jsx'
 import Sidebar from '../components/Dashboard/Sidebar.jsx'
@@ -27,7 +28,7 @@ function Dashboard() {
                     <div className='max-w-6xl mx-auto'>
                         <div className='grid grid-cols-1 xl:grid-cols-3 gap-8'>
                             <div className='xl:col-span-2 space-y-8'>
-                    
+
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'>
                                     <Card
                                         icon='/icons/carddashboard/balance-icon.svg'
@@ -60,14 +61,18 @@ function Dashboard() {
                                     <div className='flex flex-col px-8 py-6 gap-4'>
                                         <h3 className='font-bold text-xl text-gray-800'>Fast Service</h3>
                                         <div className='flex flex-wrap gap-4'>
-                                            <button className='bg-primary hover:bg-blue-700 transition-colors flex text-white items-center gap-2 px-6 py-3 rounded-xl font-medium shadow-md cursor-pointer'>
-                                                <img src='/icons/topupw.svg' alt='topup-icon' className='w-5 h-5'/>
-                                                <span>Top Up</span>
-                                            </button>
-                                            <button className='bg-primary hover:bg-blue-700 transition-colors flex text-white items-center gap-2 px-6 py-3 rounded-xl font-medium shadow-md cursor-pointer'>
-                                                <img src='/icons/Send.svg' alt='transfer--icon' className='w-5 h-5 brightness-0 invert'/>
-                                                <span>Transfer</span>
-                                            </button>
+                                            <Link to="/topup">
+                                                <button className='bg-primary hover:bg-blue-700 transition-colors flex text-white items-center gap-2 px-6 py-3 rounded-xl font-medium shadow-md cursor-pointer'>
+                                                    <img src='/icons/topupw.svg' alt='topup-icon' className='w-5 h-5' />
+                                                    <span>Top Up</span>
+                                                </button>
+                                            </Link>
+                                            <Link to="/transfer">
+                                                <button className='bg-primary hover:bg-blue-700 transition-colors flex text-white items-center gap-2 px-6 py-3 rounded-xl font-medium shadow-md cursor-pointer'>
+                                                    <img src='/icons/Send.svg' alt='transfer--icon' className='w-5 h-5 brightness-0 invert' />
+                                                    <span>Transfer</span>
+                                                </button>
+                                            </Link>
                                         </div>
                                     </div>
                                 </article>
@@ -89,6 +94,6 @@ function Dashboard() {
             </div>
         </div>
     )
-}                               
+}
 
 export default Dashboard
