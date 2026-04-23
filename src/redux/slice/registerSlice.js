@@ -18,6 +18,12 @@ const registerSlice = createSlice({
     },
 
     registerSuccess: (state, action) => {
+      const isExist = state.users.some(u => u.email === action.payload.email);
+      if (isExist) {
+        state.isLoading = false;
+        state.error = "Email sudah terdaftar!";
+        return;
+      }
       const newUser = {
         ...action.payload,
         username: action.payload.username || action.payload.email,
@@ -39,7 +45,6 @@ const registerSlice = createSlice({
       state.error = action.payload;
     },
 
-    // f. Update pin dan password terhadap data user
     savePinToUser: (state, action) => {
       const { username, pin } = action.payload;
       const user = state.users.find((u) => u.username === username || u.email === username);
@@ -47,8 +52,14 @@ const registerSlice = createSlice({
         user.pin = pin;
       }
     },
+    changeUserPassword: (state, action) => {
+      const { username, newPassword } = action.payload;
+      const user = state.users.find((u) => u.username === username || u.email === username);
+      if (user) {
+        user.password = newPassword;
+      }
+    },
 
-    // f. Update profile data (email, phone, fullName, password)
     updateUserProfile: (state, action) => {
       const { username, ...updates } = action.payload;
       const index = state.users.findIndex((u) => u.username === username || u.email === username);
@@ -57,7 +68,6 @@ const registerSlice = createSlice({
       }
     },
 
-    // v. Penyesuaian saldo (Topup & Transfer)
     updateUserBalance: (state, action) => {
       const { username, amount, type } = action.payload; 
       const user = state.users.find((u) => u.username === username || u.email === username);
@@ -65,10 +75,10 @@ const registerSlice = createSlice({
       if (user) {
         if (type === 'topup') {
           user.balance += Number(amount);
-          user.income += Number(amount); // Track pemasukan
+          user.income += Number(amount); 
         } else if (type === 'transfer') {
           user.balance -= Number(amount);
-          user.expense += Number(amount); // Track pengeluaran
+          user.expense += Number(amount);
         }
       }
     },
@@ -85,6 +95,7 @@ export const {
   registerSuccess,
   registerFailed,
   savePinToUser,
+  changeUserPassword,
   updateUserProfile,
   updateUserBalance,
   resetRegisterStatus
