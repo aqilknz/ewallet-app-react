@@ -2,16 +2,13 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux'; // Tambahkan ini
 
 export const useChangeProfile = () => {
-    // 1. Ambil data avatar dari Redux Store (karena Redux biasanya dipersist)
     const { currentUser } = useSelector((state) => state.auth);
     const defaultImage = "/icons/Profile/User.svg";
-    
-    // 2. Gunakan avatar dari Redux sebagai initial state agar tidak hilang saat refresh
+
     const [preview, setPreview] = useState(currentUser?.avatar || defaultImage);
     const [selectedFile, setSelectedFile] = useState(null);
     const [error, setError] = useState("");
 
-    // 3. Tambahkan useEffect untuk mensinkronisasi preview jika currentUser berubah
     useEffect(() => {
         if (currentUser?.avatar) {
             setPreview(currentUser.avatar);
@@ -52,7 +49,8 @@ export const useChangeProfile = () => {
     };
 
     const handleDelete = () => {
-        setPreview(defaultImage);
+        setSelectedFile(null)
+        setPreview(defaultImage)
         setSelectedFile(null);
         setError("");
     };
