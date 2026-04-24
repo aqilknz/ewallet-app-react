@@ -1,0 +1,5 @@
+node_modules
+dist
+.git
+.env
+ssh/id_rsa_aqilknz

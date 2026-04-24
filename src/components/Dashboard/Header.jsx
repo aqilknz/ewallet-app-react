@@ -29,7 +29,7 @@ function Header() {
                         onClick={() => setIsOpen(!isOpen)}
                     >
                         <span className='hidden md:block'>{currentUser?.fullName || "User"}</span>
-                        <img src={currentUser?.avatar} className='w-10 h-10 rounded-full object-cover' alt="User" />
+                        <img src={currentUser?.avatar || "/icons/Profile/User.svg"} className='w-10 h-10 rounded-full object-cover' alt="User" />
                         <img
                             src='/icons/down.svg'
                             className={`md:hidden w-6 h-6 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}

@@ -4,10 +4,11 @@ import { Provider } from "react-redux";
 // import { store, persistor } from "../redux/store.js";
 // import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from 'react-hot-toast';
-import AuthProtect from '../components/Auth/AuthProtect.jsx';
+import ProtectedRoute from '../components/Auth/ProtectedRoute.jsx';
 import Login from '../pages/Login.jsx'
 import Register from '../pages/Register.jsx'
 import LandingPage from '../pages/LandingPage.jsx'
+import DashboardLayout from '../Layout/DashboardLayout.jsx';
 import Dashboard from '../pages/Dashboard.jsx'
 import Transfer from '../pages/Transfer.jsx'
 import History from '../pages/History.jsx'
@@ -34,18 +35,20 @@ function AppRoute() {
           <Route path="forgotpassword" element={<ForgotPassword />} />
           <Route path="enterpin" element={<EnterPin />} />
         </Route>
-        <Route element={<AuthProtect />}>
-          <Route path='dashboard' element={<Dashboard />} />
-          <Route path='transfer'>
-            <Route index element={<Transfer />} />
-            <Route path='detail' element={<TransferDetail />} />
-          </Route>
-          <Route path='history' element={<History />} />
-          <Route path='topup' element={<TopUpPage />} />
-          <Route path='profile'>
-            <Route index element={<Profile />} />
-            <Route path='changepassword' element={<ChangePassword />} />
-            <Route path='changepin' element={<ChangePin />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='transfer'>
+              <Route index element={<Transfer />} />
+              <Route path='detail' element={<TransferDetail />} />
+            </Route>
+            <Route path='history' element={<History />} />
+            <Route path='topup' element={<TopUpPage />} />
+            <Route path='profile'>
+              <Route index element={<Profile />} />
+              <Route path='changepassword' element={<ChangePassword />} />
+              <Route path='changepin' element={<ChangePin />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

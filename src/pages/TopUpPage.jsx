@@ -78,7 +78,7 @@ const TopUpPage = () => {
                                 <div>
                                     <h3 className="font-semibold text-lg text-gray-900 mb-3 block">Account Information</h3>
                                     <div className="bg-gray-50 p-4 rounded-xl flex items-center gap-5">
-                                        <img src={currentUser?.avatar} alt="profile" className="w-14 h-14 rounded-lg object-cover" />
+                                        <img src={currentUser?.avatar || "/icons/Profile/User.svg"} alt="profile" className="w-14 h-14 rounded-lg object-cover" />
                                         <div className="flex flex-col gap-1">
                                             <strong className="text-sm text-gray-800">{currentUser?.fullName}</strong>
                                             <span className="text-xs text-gray-500">{currentUser?.phone}</span>
