@@ -28,7 +28,7 @@ function Header() {
                         className='flex items-center cursor-pointer gap-2 hover:bg-gray-50 p-2 rounded-xl transition-all'
                         onClick={() => setIsOpen(!isOpen)}
                     >
-                        <span className='hidden md:block'>{currentUser?.fullName || "User"}</span>
+                        <span className='hidden md:block font-bold'>{currentUser?.fullName || "User"}</span>
                         <img src={currentUser?.avatar || "/icons/Profile/User.svg"} className='w-10 h-10 rounded-full object-cover' alt="User" />
                         <img
                             src='/icons/down.svg'
