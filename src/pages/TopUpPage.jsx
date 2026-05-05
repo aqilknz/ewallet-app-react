@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setPendingTransaction } from '../redux/slice/transactionSlice';
+import { setPendingTransaction, addTransaction } from '../redux/slice/transactionSlice';
 import { updateUserBalance } from '../redux/slice/registerSlice';
 import { loginSuccess } from '../redux/slice/authSlice';
 import toast from 'react-hot-toast';
@@ -31,6 +31,8 @@ const TopUpPage = () => {
 
     const handleTopUpSubmit = () => {
         if (nominal < 10000) return toast.error("Minimal Top Up Rp 10.000");
+        if (!selectedBank) return toast.error("Pilih metode pembayaran terlebih dahulu");
+        const bankDetail = bankOpt.find(b => b.id === selectedBank);
 
         dispatch(updateUserBalance({
             username: currentUser.email,
@@ -48,6 +50,13 @@ const TopUpPage = () => {
             total: total,
             bank: selectedBank
         }));
+        const formattedAmount = new Intl.NumberFormat('id-ID').format(nominal);
+        dispatch(addTransaction({
+            name: `Top Up ${bankDetail?.name}`, 
+            type: "Top Up",
+            amount: `+Rp${formattedAmount}`,
+            img: bankDetail?.icon || "/icons/topupw.svg"
+        }));
 
         // toast.loading("Menuju verifikasi PIN...", { duration: 1000 });
         toast.success("Top Up successfully!", { duration: 1000 });
@@ -57,7 +66,7 @@ const TopUpPage = () => {
         setAmount('')
         setSelectedBank('')
 
-        setTimeout(() => navigate('/topup'), 1000);
+        setTimeout(() => navigate('/dashboard'), 1000);
     };
 
     return (
@@ -89,7 +98,7 @@ const TopUpPage = () => {
                         <div className="relative">
                             <img src="/icons/money.svg" className="absolute left-4 top-3.5 w-5 opacity-60" />
                             <input
-                                type="number"
+                                type="text"
                                 placeholder="Enter Nominal Transfer"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
