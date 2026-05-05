@@ -82,6 +82,15 @@ const registerSlice = createSlice({
         }
       }
     },
+    updateTransfer: (state, action) => {
+      const { username, amount } = action.payload; 
+      const user = state.users.find((u) => u.username === username || u.email === username);
+      
+      if (user) {
+         user.balance -= Number(amount);
+         user.expense += Number(amount);
+      }
+    },
 
     resetRegisterStatus: (state) => {
       state.isSuccess = false;
@@ -98,6 +107,7 @@ export const {
   changeUserPassword,
   updateUserProfile,
   updateUserBalance,
+  updateTransfer,
   resetRegisterStatus
 } = registerSlice.actions;
 
