@@ -1,17 +1,19 @@
 import React from 'react'
+import { useSelector } from 'react-redux';
 
 function TransactionList() {
-    const dataList = [
-        { name: "Robert Fox", type: "Transfer", amount: "+Rp50.000", img: "/images/1.svg" },
-        { name: "Floyd Miles", type: "Send", amount: "-Rp50.000", img: "/images/1-2.svg" },
-        { name: "Ujang", type: "Send", amount: "-Rp50.000", img: "/images/1-3.svg" },
-        { name: "Robert Fox", type: "Transfer", amount: "+Rp50.000", img: "/images/1.svg" },
-        { name: "Floyd Miles", type: "Send", amount: "-Rp50.000", img: "/images/1-2.svg" },
-        { name: "Ujang", type: "Send", amount: "-Rp50.000", img: "/images/1-3.svg" },
-        { name: "Robert Fox", type: "Transfer", amount: "+Rp50.000", img: "/images/1.svg" },
-        { name: "Floyd Miles", type: "Send", amount: "-Rp50.000", img: "/images/1-2.svg" },
-        { name: "Ujang", type: "Send", amount: "-Rp50.000", img: "/images/1-3.svg" },
-    ];
+    const { transactions } = useSelector((state) => state.transaction);
+    // const dataList = [
+    //     { name: "Robert Fox", type: "Transfer", amount: "+Rp50.000", img: "/images/1.svg" },
+    //     { name: "Floyd Miles", type: "Send", amount: "-Rp50.000", img: "/images/1-2.svg" },
+    //     { name: "Ujang", type: "Send", amount: "-Rp50.000", img: "/images/1-3.svg" },
+    //     { name: "Robert Fox", type: "Transfer", amount: "+Rp50.000", img: "/images/1.svg" },
+    //     { name: "Floyd Miles", type: "Send", amount: "-Rp50.000", img: "/images/1-2.svg" },
+    //     { name: "Ujang", type: "Send", amount: "-Rp50.000", img: "/images/1-3.svg" },
+    //     { name: "Robert Fox", type: "Transfer", amount: "+Rp50.000", img: "/images/1.svg" },
+    //     { name: "Floyd Miles", type: "Send", amount: "-Rp50.000", img: "/images/1-2.svg" },
+    //     { name: "Ujang", type: "Send", amount: "-Rp50.000", img: "/images/1-3.svg" },
+    // ];
     return (
         <div className="p-5 bg-white rounded-xl border-secondary shadow-sm w-full px-10">
             <div className="flex justify-between mb-4">
@@ -20,7 +22,7 @@ function TransactionList() {
             </div>
 
             <div className="flex flex-col">
-                {dataList.map((t, i) => (
+                {transactions.map((t, i) => (
                     <div key={i} className="flex items-center gap-4 py-3 border-b border-secondary">
                         <img src={t.img} className="w-12 h-12 rounded-lg" />
 
