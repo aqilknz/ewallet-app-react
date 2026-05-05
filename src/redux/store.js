@@ -25,11 +25,16 @@ export const registerPersistConfig = {
     storage,
     whitelist: ['users'] 
 };
+export const transactionPersistConfig = {
+    key: "transactionSession",
+    storage,
+    whitelist: ['transactions']
+};
 
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   register: persistReducer(registerPersistConfig, registerReducer),
-  transaction: transactionReducer,
+  transaction: persistReducer(transactionPersistConfig, transactionReducer),
 });
 
 export const store = configureStore({
