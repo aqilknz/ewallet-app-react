@@ -1,19 +1,23 @@
 import React, { useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router';
-import { DataHistory } from './data/DataHistory';
+import { useSelector, useDispatch } from 'react-redux';
+// import { DataHistory } from './data/DataHistory';
+import { deleteTransaction } from '../../redux/slice/transactionSlice';
 
 function HistoryList() {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch()
     const search = (searchParams.get('search') || '').toLowerCase();
+    const { transactions } = useSelector((state) => state.transaction);
     const currentPage = parseInt(searchParams.get('page') || '1');
     const itemsPerPage = 5;
     const filteredData = useMemo(() => {
-        return DataHistory.filter((item) =>
-            item.name.toLowerCase().includes(search) ||
-            item.telp.includes(search)
+        return transactions.filter((item) =>
+            item.name?.toLowerCase().includes(search) ||
+            item.telp?.toLowerCase().includes(search)
         );
-    }, [search]);
+    }, [search, transactions]);
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -21,6 +25,10 @@ function HistoryList() {
 
     const handlePageChange = (newPage) => {
         setSearchParams({ search, page: newPage.toString() });
+    };
+    const handleDelete = (e, id) => {
+        e.stopPropagation(); 
+        dispatch(deleteTransaction(id));
     };
     return (
         <div className='w-full'>
@@ -36,11 +44,11 @@ function HistoryList() {
                                     <tr
                                         key={item.id}
                                         className="bg-white hover:bg-secondary transition-colors odd:bg-gray-100 cursor-pointer"
-                                        onClick={() => navigate(`/transfer/detail?id=${item.id}`)}
+                                        // onClick={() => navigate(`/transfer/detail?id=${item.id}`)}
                                     >
                                         <td className="p-2 w-16">
                                             <img
-                                                src={item.path}
+                                                src={item.img}
                                                 alt={item.name}
                                                 className="w-10 h-10"
                                             />
@@ -51,17 +59,17 @@ function HistoryList() {
                                         </td>
 
                                         <td className="p-2 text-center">
-                                            {item.telp}
+                                            {item.type}
                                         </td>
 
                                         <td className="p-2 text-center">
-                                            <span className={`font-bold ${isPos ? 'text-green-500' : 'text-red-500'}`}>
-                                                {item.money}
+                                            <span className={`font-bold ${item.type.includes('Top Up') ? 'text-green-500' : 'text-red-500'}`}>
+                                                {item.amount}
                                             </span>
                                         </td>
 
                                         <td className="p-2 text-center w-16">
-                                            <button>
+                                            <button onClick={(e)=>handleDelete(e, item.id)}>
                                                 <img
                                                     src='/icons/Trash.svg'
                                                     alt="delete"
