@@ -7,12 +7,6 @@ import { useEffect } from "react";
 const ProtectedRoute = () => {
     const { isLogin, currentUser } = useAuth();
     const location = useLocation();
-
-    useEffect(() =>{
-        if(!isLogin){
-            toast.error(`Silahkan Login terlebih dahulu!`)
-        }
-    },[isLogin])
     if (!isLogin) {
         return <Navigate to="/auth" replace />;
     }
