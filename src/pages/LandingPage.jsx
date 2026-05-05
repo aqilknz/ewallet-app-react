@@ -36,7 +36,7 @@ function LandingPage() {
                     <CardPartners partner="/icons/logopartner/Group 17.svg" />
                     <CardPartners partner="/icons/logopartner/Group 18.svg" />
                 </section>
-                <section className='bg-white py-30 px-10 min-w-screen md:flex md:flex-row'>
+                <section className='bg-white py-30 px-10 min-w-full md:flex md:flex-row'>
                     <div className='flex flex-col justify-center items-center gap-5 flex-1 mb-10'>
                         <h2 className='text-3xl w-full text-center font-semibold md:text-left md:text-4xl'>About The Application</h2>
                         <p className='w-full text-center md:text-left md:text-lg'>We have some great features from the application and it’s totally free to use by all users around the world..</p>
