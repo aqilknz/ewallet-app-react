@@ -3,15 +3,24 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from 'react-router'
 import { logoutUser } from '../../redux/slice/authSlice';
 import { useDispatch } from "react-redux";
+import { Modal } from './Modal';
+import toast from 'react-hot-toast';
 
 function Header() {
     const { currentUser } = useSelector((state) => state.auth);
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     function handleLogout() {
-        dispatch(logoutUser())
-        navigate("/auth", { replace: true });
+        toast('Sampai Jumpa Kembali! 👋',{
+            duration: 1000
+        })
+        setTimeout(() => {
+                dispatch(logoutUser());
+                navigate("/auth", { replace: true });
+            }, 1000
+        )
     }
 
     return (
@@ -66,7 +75,10 @@ function Header() {
                                     Profile
                                 </Link>
                                 <button
-                                    onClick={handleLogout}
+                                    onClick={() => {
+                                        setIsOpen(false)
+                                        setIsLogoutModalOpen(true)
+                                    }}
                                     className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg font-semibold"
                                 >
                                     Keluar
@@ -76,6 +88,33 @@ function Header() {
                     )}
                 </div>
             </div>
+            <Modal
+                isOpen={isLogoutModalOpen}
+                onClose={() => setIsLogoutModalOpen(false)}
+            // inner="max-w-sm w-full"
+            >
+                <div className="p-8 text-center bg-white rounded-2xl shadow-xl">
+                    {/* <h2 className="text-2xl font-bold text-gray-900 mb-2">Konfirmasi Keluar</h2> */}
+                    <p className="text-gray-500 mb-8 px-4">
+                        Apakah anda yakin ingin keluar dari akun ini?
+                    </p>
+
+                    <div className="flex gap-3 text-sm">
+                        <button
+                            onClick={handleLogout}
+                            className="w-full py-4 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-lg shadow-red-100 cursor-pointer"
+                        >
+                            Ya, Keluar Sekarang
+                        </button>
+                        <button
+                            onClick={() => setIsLogoutModalOpen(false)}
+                            className="w-full py-4 border-2 border-gray-100 text-gray-500 rounded-xl font-bold hover:bg-gray-200 transition cursor-pointer"
+                        >
+                            Batal
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </header>
     );
 }
