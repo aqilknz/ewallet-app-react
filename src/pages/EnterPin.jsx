@@ -16,7 +16,6 @@ function EnterPin() {
     const { currentUser } = useSelector((state) => state.auth);
     const { pendingTransaction } = useSelector((state) => state.transaction);
 
-    // Logika PIN tetap menggunakan custom hook Anda
     const { pin, inputRefs, handleChange, handleKeyDown, pinString } = usePinLogic(6);
 
     useEffect(() => {
@@ -57,7 +56,6 @@ function EnterPin() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-8 mt-4">
-                    {/* Styling tetap terjaga karena props dikirim ke PinInput yang memiliki class yang sama */}
                     <PinInput 
                         pin={pin} 
                         inputRefs={inputRefs} 
