@@ -23,6 +23,9 @@ export const usePinLogic = (length = 6) => {
             inputRefs.current[index - 1].focus();
         }
     };
+    const resetPin = () => {
+        setPin(new Array(6).fill(""));
+    };
 
-    return { pin, inputRefs, handleChange, handleKeyDown, pinString: pin.join("") };
+    return { pin, inputRefs, handleChange, handleKeyDown, resetPin, pinString: pin.join("") };
 };
