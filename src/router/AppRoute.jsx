@@ -1,6 +1,7 @@
 import React from 'react'
 import { Routes, Route, Outlet } from 'react-router-dom'
 import { Provider } from "react-redux";
+import { useScrollToTop } from '../hooks/useScrollToTop.jsx';
 // import { store, persistor } from "../redux/store.js";
 // import { PersistGate } from "redux-persist/integration/react";
 import { Toaster } from 'react-hot-toast';
@@ -24,6 +25,7 @@ import TransferDetail from '../pages/TransferDetail.jsx'
 // import Dashboard from '../pages/Dashboard.jsx'
 
 function AppRoute() {
+  useScrollToTop();
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
