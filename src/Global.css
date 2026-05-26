@@ -7,14 +7,12 @@
   --font-nunito: "Nunito", sans-serif;
   --color-primary: #2948ff;
   --color-secondary: #e8e8e8;
-
 }
 
-  input::-ms-reveal,
-  input::-ms-clear {
+input::-ms-reveal,
+input::-ms-clear {
   display: none;
 }
-
 
 @layer base {
   body {

@@ -5,17 +5,17 @@ import { replace } from "react-router";
 import { useEffect } from "react";
 
 const ProtectedRoute = () => {
-    const { isLogin, currentUser } = useAuth();
-    const location = useLocation();
-    if (!isLogin) {
-        return <Navigate to="/auth" replace />;
-    }
+  const { isLogin, currentUser } = useAuth();
+  const location = useLocation();
+  if (!isLogin) {
+    return <Navigate to="/auth" replace />;
+  }
 
-if (!currentUser?.pin && location.pathname !== "/auth/enterpin") {
+  if (!currentUser?.pin && location.pathname !== "/auth/enterpin") {
     return <Navigate to="/auth/enterpin" replace />;
-}
+  }
 
-return <Outlet />;
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

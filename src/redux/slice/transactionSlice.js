@@ -4,7 +4,7 @@ const transactionSlice = createSlice({
   name: "transaction",
   initialState: {
     pendingTransaction: null,
-    transactions: []
+    transactions: [],
   },
   reducers: {
     setPendingTransaction: (state, action) => {
@@ -15,15 +15,22 @@ const transactionSlice = createSlice({
     },
     addTransaction: (state, action) => {
       state.transactions.unshift({
-          id: Date.now(), 
-          ...action.payload
+        id: Date.now(),
+        ...action.payload,
       });
     },
     deleteTransaction: (state, action) => {
-      state.transactions = state.transactions.filter(t => t.id !== action.payload);
-    }
+      state.transactions = state.transactions.filter(
+        (t) => t.id !== action.payload,
+      );
+    },
   },
 });
 
-export const { setPendingTransaction, clearPendingTransaction, addTransaction, deleteTransaction } = transactionSlice.actions;
+export const {
+  setPendingTransaction,
+  clearPendingTransaction,
+  addTransaction,
+  deleteTransaction,
+} = transactionSlice.actions;
 export default transactionSlice.reducer;

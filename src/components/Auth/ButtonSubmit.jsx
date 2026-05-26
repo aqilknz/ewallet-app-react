@@ -1,19 +1,24 @@
-import React from 'react'
-import '../../Global.css'
+import React from "react";
+import "../../Global.css";
 
 /**
- * 
- * @param {object} props 
+ *
+ * @param {object} props
  * @param {string} props.label
  * @returns {JSX.Element}
  */
 
 function ButtonSubmit({ label }) {
-    return (
-        <div className='w-full'>
-            <button type="submit" className='flex flex-col justify-center w-full items-center bg-primary text-white font-monserrat font-bold py-2 px-4 my-2 rounded-lg cursor-pointer hover:bg-blue-800'>{label}</button>
-        </div>
-    )
+  return (
+    <div className="w-full">
+      <button
+        type="submit"
+        className="bg-primary font-monserrat my-2 flex w-full cursor-pointer flex-col items-center justify-center rounded-lg px-4 py-2 font-bold text-white hover:bg-blue-800"
+      >
+        {label}
+      </button>
+    </div>
+  );
 }
 
-export default ButtonSubmit
+export default ButtonSubmit;

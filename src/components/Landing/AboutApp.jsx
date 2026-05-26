@@ -1,8 +1,8 @@
-import React from 'react'
+import React from "react";
 
 /**
- * 
- * @param {object} props 
+ *
+ * @param {object} props
  * @param {string} props.image
  * @param {string} props.name
  * @param {string} prop.description
@@ -10,17 +10,19 @@ import React from 'react'
  */
 
 function AboutApp({ image, name, description }) {
-    return (
-        <div className='bg-primary flex flex-col items-center gap-5 px-6 py-10 rounded-2xl text-white w-full h-auto shadow-lg'>
-            <div className='w-16 h-16 bg-white rounded-full flex items-center justify-center p-3 shrink-0'>
-                <img src={image} alt={name} className='w-full h-full object-contain' />
-            </div>
-            <div className='flex flex-col gap-3'>
-                <h3 className='text-lg md:text-2xl font-bold text-center'>{name}</h3>
-                <p className='text-base md:text-lg text-center opacity-90 leading-relaxed'>{description}</p>
-            </div>
-        </div>
-    )
+  return (
+    <div className="bg-primary flex h-auto w-full flex-col items-center gap-5 rounded-2xl px-6 py-10 text-white shadow-lg">
+      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white p-3">
+        <img src={image} alt={name} className="h-full w-full object-contain" />
+      </div>
+      <div className="flex flex-col gap-3">
+        <h3 className="text-center text-lg font-bold md:text-2xl">{name}</h3>
+        <p className="text-center text-base leading-relaxed opacity-90 md:text-lg">
+          {description}
+        </p>
+      </div>
+    </div>
+  );
 }
 
-export default AboutApp
+export default AboutApp;

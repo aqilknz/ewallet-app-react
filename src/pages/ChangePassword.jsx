@@ -1,31 +1,31 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { changeUserPassword } from '../redux/slice/registerSlice'
-import { loginSuccess } from '../redux/slice/authSlice'
-import toast from 'react-hot-toast'
-import Header from '../components/Dashboard/Header'
-import Sidebar from '../components/Dashboard/Sidebar'
-import InputForm from '../components/Auth/InputForm'
-import ButtonSubmit from '../components/Auth/ButtonSubmit'
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { changeUserPassword } from "../redux/slice/registerSlice";
+import { loginSuccess } from "../redux/slice/authSlice";
+import toast from "react-hot-toast";
+import Header from "../components/Dashboard/Header";
+import Sidebar from "../components/Dashboard/Sidebar";
+import InputForm from "../components/Auth/InputForm";
+import ButtonSubmit from "../components/Auth/ButtonSubmit";
 
 function ChangePassword() {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
-    existingPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    existingPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-    if (error) setError('');
+    if (error) setError("");
   };
 
   const handleChangePassword = (e) => {
@@ -47,39 +47,42 @@ function ChangePassword() {
 
     const userKey = currentUser.email || currentUser.username;
 
-    dispatch(changeUserPassword({
-      username: userKey,
-      newPassword: newPassword
-    }));
+    dispatch(
+      changeUserPassword({
+        username: userKey,
+        newPassword: newPassword,
+      }),
+    );
 
-    dispatch(loginSuccess({
-      ...currentUser,
-      password: newPassword
-    }));
+    dispatch(
+      loginSuccess({
+        ...currentUser,
+        password: newPassword,
+      }),
+    );
 
     toast.success("Password changed successfully!");
 
     setFormData({
-      existingPassword: '',
-      newPassword: '',
-      confirmPassword: ''
+      existingPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     });
   };
 
   return (
     <>
-
-      <div className="flex items-center gap-3 mb-6">
+      <div className="mb-6 flex items-center gap-3">
         <img src="/icons/Profile/User-blue.svg" alt="Profile" className="w-5" />
         <h2 className="text-lg font-semibold">Profile</h2>
       </div>
 
-      <section className="border border-gray-300 rounded-lg p-6 w-full">
-        <h3 className='font-semibold text-lg text-gray-900 mb-3 block'>
+      <section className="w-full rounded-lg border border-gray-300 p-6">
+        <h3 className="mb-3 block text-lg font-semibold text-gray-900">
           Change Password
         </h3>
-        <form className='flex flex-col gap-4' onSubmit={handleChangePassword}>
-          <div className='flex flex-col gap-4'>
+        <form className="flex flex-col gap-4" onSubmit={handleChangePassword}>
+          <div className="flex flex-col gap-4">
             <InputForm
               text="Existing Password"
               type="password"
@@ -108,16 +111,16 @@ function ChangePassword() {
               path="/icons/Password.svg"
             />
           </div>
-          <div className='w-full h-2'>
+          <div className="h-2 w-full">
             {error && (
-              <p className='w-full text-red-500 font-medium text-sm'>{error}</p>
+              <p className="w-full text-sm font-medium text-red-500">{error}</p>
             )}
           </div>
           <ButtonSubmit label="Submit" />
         </form>
       </section>
     </>
-  )
+  );
 }
 
-export default ChangePassword
+export default ChangePassword;

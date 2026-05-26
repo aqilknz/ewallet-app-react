@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { 
-  persistStore, 
+import {
+  persistStore,
   persistReducer,
   FLUSH,
   REHYDRATE,
@@ -12,23 +12,23 @@ import {
 import storage from "redux-persist/es/storage";
 import authReducer from "./slice/authSlice";
 import registerReducer from "./slice/registerSlice";
-import transactionReducer from "./slice/transactionSlice"
+import transactionReducer from "./slice/transactionSlice";
 
 export const authPersistConfig = {
-    key: "authSession",
-    storage,
-    whitelist: ['currentUser', 'isAuthenticated'] 
+  key: "authSession",
+  storage,
+  whitelist: ["currentUser", "isAuthenticated"],
 };
 
 export const registerPersistConfig = {
-    key: "registerSession",
-    storage,
-    whitelist: ['users'] 
+  key: "registerSession",
+  storage,
+  whitelist: ["users"],
 };
 export const transactionPersistConfig = {
-    key: "transactionSession",
-    storage,
-    whitelist: ['transactions']
+  key: "transactionSession",
+  storage,
+  whitelist: ["transactions"],
 };
 
 const rootReducer = combineReducers({
@@ -38,11 +38,10 @@ const rootReducer = combineReducers({
 });
 
 export const store = configureStore({
-    reducer: rootReducer,
-    middleware: (getDefaultMiddleware) =>
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),

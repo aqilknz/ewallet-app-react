@@ -18,7 +18,7 @@ const registerSlice = createSlice({
     },
 
     registerSuccess: (state, action) => {
-      const isExist = state.users.some(u => u.email === action.payload.email);
+      const isExist = state.users.some((u) => u.email === action.payload.email);
       if (isExist) {
         state.isLoading = false;
         state.error = "Email sudah terdaftar!";
@@ -47,14 +47,18 @@ const registerSlice = createSlice({
 
     savePinToUser: (state, action) => {
       const { username, pin } = action.payload;
-      const user = state.users.find((u) => u.username === username || u.email === username);
+      const user = state.users.find(
+        (u) => u.username === username || u.email === username,
+      );
       if (user) {
         user.pin = pin;
       }
     },
     changeUserPassword: (state, action) => {
       const { username, newPassword } = action.payload;
-      const user = state.users.find((u) => u.username === username || u.email === username);
+      const user = state.users.find(
+        (u) => u.username === username || u.email === username,
+      );
       if (user) {
         user.password = newPassword;
       }
@@ -62,40 +66,46 @@ const registerSlice = createSlice({
 
     updateUserProfile: (state, action) => {
       const { username, ...updates } = action.payload;
-      const index = state.users.findIndex((u) => u.username === username || u.email === username);
+      const index = state.users.findIndex(
+        (u) => u.username === username || u.email === username,
+      );
       if (index !== -1) {
         state.users[index] = { ...state.users[index], ...updates };
       }
     },
 
     updateUserBalance: (state, action) => {
-      const { username, amount, type } = action.payload; 
-      const user = state.users.find((u) => u.username === username || u.email === username);
-      
+      const { username, amount, type } = action.payload;
+      const user = state.users.find(
+        (u) => u.username === username || u.email === username,
+      );
+
       if (user) {
-        if (type === 'topup') {
+        if (type === "topup") {
           user.balance += Number(amount);
-          user.income += Number(amount); 
-        } else if (type === 'transfer') {
+          user.income += Number(amount);
+        } else if (type === "transfer") {
           user.balance -= Number(amount);
           user.expense += Number(amount);
         }
       }
     },
     updateTransfer: (state, action) => {
-      const { username, amount } = action.payload; 
-      const user = state.users.find((u) => u.username === username || u.email === username);
-      
+      const { username, amount } = action.payload;
+      const user = state.users.find(
+        (u) => u.username === username || u.email === username,
+      );
+
       if (user) {
-         user.balance -= Number(amount);
-         user.expense += Number(amount);
+        user.balance -= Number(amount);
+        user.expense += Number(amount);
       }
     },
 
     resetRegisterStatus: (state) => {
       state.isSuccess = false;
       state.error = null;
-    }
+    },
   },
 });
 
@@ -108,7 +118,7 @@ export const {
   updateUserProfile,
   updateUserBalance,
   updateTransfer,
-  resetRegisterStatus
+  resetRegisterStatus,
 } = registerSlice.actions;
 
 export default registerSlice.reducer;
