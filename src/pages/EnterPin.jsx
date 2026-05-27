@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { savePinToUser } from "../redux/slice/registerSlice";
-import { loginSuccess } from "../redux/slice/authSlice";
+// import { savePinToUser } from "../redux/slice/registerSlice";
+// import { loginSuccess } from "../redux/slice/authSlice";
+import { createPin } from "../redux/slice/loginUserSlice";
 import { usePinLogic } from "../hooks/usePinLogic";
 import toast from "react-hot-toast";
 
@@ -12,17 +13,28 @@ import PinInput from "../components/Auth/PinInput";
 function EnterPin() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { isAuthenticated, token, isLoading, hasPin } = useSelector((state) => state.auth);
 
-  const { currentUser } = useSelector((state) => state.auth);
-  const { pendingTransaction } = useSelector((state) => state.transaction);
+  // const { currentUser } = useSelector((state) => state.auth);
+  // const { pendingTransaction } = useSelector((state) => state.transaction);
 
   const { pin, inputRefs, handleChange, handleKeyDown, pinString } =
     usePinLogic(6);
 
+  // useEffect(() => {
+  //   if (!currentUser) navigate("/auth");
+  // }, [currentUser, navigate]);
   useEffect(() => {
-    if (!currentUser) navigate("/auth");
-  }, [currentUser, navigate]);
-
+    if (!isAuthenticated || !token) {
+      navigate("/auth");
+    }
+  }, [isAuthenticated, token, navigate]);
+  useEffect(() => {
+    if (hasPin) {
+      toast.success("PIN Berhasil disetel!");
+      setTimeout(() => navigate("/dashboard"), 1000);
+    }
+  }, [hasPin, navigate]);
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
 
@@ -30,13 +42,28 @@ function EnterPin() {
       return toast.error("Silakan isi PIN 6 digit secara lengkap");
     }
 
-    const userKey = currentUser.username || currentUser.email;
-    dispatch(savePinToUser({ username: userKey, pin: pinString }));
-    dispatch(loginSuccess({ ...currentUser, pin: pinString }));
+    // Tembak API createPin ke Golang
+    dispatch(createPin(pinString))
+      .unwrap()
+      .catch((err) => {
+        toast.error(err || "Gagal menyetel PIN");
+      });
+    };
 
-    toast.success("PIN Berhasil disetel!");
-    setTimeout(() => navigate("/dashboard"), 1000);
-  };
+  // const handleSubmit = (e) => {
+  //   if (e) e.preventDefault();
+
+  //   if (pinString.length < 6) {
+  //     return toast.error("Silakan isi PIN 6 digit secara lengkap");
+  //   }
+
+  //   const userKey = currentUser.username || currentUser.email;
+  //   dispatch(savePinToUser({ username: userKey, pin: pinString }));
+  //   dispatch(loginSuccess({ ...currentUser, pin: pinString }));
+
+  //   toast.success("PIN Berhasil disetel!");
+  //   setTimeout(() => navigate("/dashboard"), 1000);
+  // };
 
   return (
     <main className="md:bg-primary flex min-h-screen">
@@ -70,7 +97,8 @@ function EnterPin() {
           />
 
           <ButtonSubmit
-            label={pendingTransaction ? "Confirm Payment" : "Submit"}
+            label={isLoading ? "Processing..." : "Submit"}
+            disabled={isLoading}
           />
         </form>
 
