@@ -1,26 +1,43 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
-import { logoutUser } from "../../redux/slice/authSlice";
+// import { logoutUser } from "../../redux/slice/authSlice";
+import { logoutUserSlice } from "../../redux/slice/loginUserSlice";
 import { useDispatch } from "react-redux";
 import { Modal } from "./Modal";
 import toast from "react-hot-toast";
 
 function Header() {
-  const { currentUser } = useSelector((state) => state.auth);
+  // const { currentUser } = useSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const { isLoading } = useSelector((state) => state.auth);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  function handleLogout() {
-    toast("Sampai Jumpa Kembali! 👋", {
-      duration: 1000,
-    });
-    setTimeout(() => {
-      dispatch(logoutUser());
-      navigate("/auth", { replace: true });
-    }, 1000);
-  }
+  // function handleLogout() {
+  //   toast("Sampai Jumpa Kembali! 👋", {
+  //     duration: 1000,
+  //   });
+  //   setTimeout(() => {
+  //     dispatch(logoutUser());
+  //     navigate("/auth", { replace: true });
+  //   }, 1000);
+  // }
+  const handleLogout = () => {
+    dispatch(logoutUserSlice())
+      .unwrap()
+      .then(() => {
+        toast.success("Sampai Jumpa Kembali! 👋", { duration: 2000 });
+        setIsLogoutModalOpen(false);
+        navigate("/auth", { replace: true });
+      })
+      .catch((err) => {
+        toast.error(err || "Sesi diakhiri");
+        setIsLogoutModalOpen(false);
+        navigate("/auth", { replace: true });
+      });
+  };
 
   return (
     <header className="border-secondary min-w-full border-b-2 bg-white">
@@ -120,12 +137,14 @@ function Header() {
           <div className="flex gap-3 text-sm">
             <button
               onClick={handleLogout}
+              disabled={isLoading}
               className="w-full cursor-pointer rounded-xl bg-red-500 py-4 font-bold text-white shadow-lg shadow-red-100 transition hover:bg-red-600"
             >
-              Ya, Keluar Sekarang
+              {isLoading ? "Memproses..." : "Ya, Keluar Sekarang"}
             </button>
             <button
               onClick={() => setIsLogoutModalOpen(false)}
+              disabled={isLoading}
               className="w-full cursor-pointer rounded-xl border-2 border-gray-100 py-4 font-bold text-gray-500 transition hover:bg-gray-200"
             >
               Batal
