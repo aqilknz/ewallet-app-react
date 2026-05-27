@@ -10,30 +10,42 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/es/storage";
-import authReducer from "./slice/authSlice";
-import registerReducer from "./slice/registerSlice";
+// import authReducer from "./slice/authSlice";
+// import registerReducer from "./slice/registerSlice";
 import transactionReducer from "./slice/transactionSlice";
+import authSliceReducer from "./slice/loginUserSlice"
+import registerSliceReducer from "./slice/registerUserSlice"
 
+// export const authPersistConfig = {
+//   key: "authSession",
+//   storage,
+//   whitelist: ["currentUser", "isAuthenticated"],
+// };
+
+// export const registerPersistConfig = {
+//   key: "registerSession",
+//   storage,
+//   whitelist: ["users"],
+// };
 export const authPersistConfig = {
   key: "authSession",
   storage,
-  whitelist: ["currentUser", "isAuthenticated"],
-};
-
-export const registerPersistConfig = {
-  key: "registerSession",
-  storage,
-  whitelist: ["users"],
+  whitelist: ["token", "hasPin", "isAuthenticated"],
 };
 export const transactionPersistConfig = {
   key: "transactionSession",
   storage,
-  whitelist: ["transactions"],
+  whitelist: ["transactions", "pendingTransaction"], 
 };
 
+// const rootReducer = combineReducers({
+//   auth: persistReducer(authPersistConfig, authReducer),
+//   register: persistReducer(registerPersistConfig, registerReducer),
+//   transaction: persistReducer(transactionPersistConfig, transactionReducer),
+// });
 const rootReducer = combineReducers({
-  auth: persistReducer(authPersistConfig, authReducer),
-  register: persistReducer(registerPersistConfig, registerReducer),
+  auth: persistReducer(authPersistConfig, authSliceReducer),
+  register: registerSliceReducer,
   transaction: persistReducer(transactionPersistConfig, transactionReducer),
 });
 
