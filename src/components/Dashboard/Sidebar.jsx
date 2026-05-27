@@ -1,24 +1,39 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { logoutUser } from "../../redux/slice/authSlice";
+import { useDispatch,useSelector } from "react-redux";
+// import { logoutUser } from "../../redux/slice/authSlice";
 import { Modal } from "./Modal";
 import toast from "react-hot-toast";
+import { logoutUserSlice } from "../../redux/slice/loginUserSlice";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { isLoading } = useSelector((state) => state.auth);
+
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
-    toast("Sampai Jumpa Kembali! 👋", {
-      duration: 1000,
-    });
-    setTimeout(() => {
-      dispatch(logoutUser());
-      navigate("/auth", { replace: true });
-    }, 1000);
+    // toast("Sampai Jumpa Kembali! 👋", {
+    //   duration: 1000,
+    // });
+    // setTimeout(() => {
+    //   dispatch(logoutUser());
+    //   navigate("/auth", { replace: true });
+    // }, 1000);
+    dispatch(logoutUserSlice())
+      .unwrap()
+      .then(() => {
+        toast.success("Sampai Jumpa Kembali! 👋", { duration: 2000 });
+        setIsLogoutModalOpen(false);
+        navigate("/auth", { replace: true });
+      })
+      .catch((err) => {
+        toast.error(err || "Sesi diakhiri");
+        setIsLogoutModalOpen(false);
+        navigate("/auth", { replace: true });
+      });
   };
 
   const menuItems = [
