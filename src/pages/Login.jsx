@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { loginSuccess, loginFailed } from "../redux/slice/authSlice.js";
+// import { loginSuccess, loginFailed } from "../redux/slice/authSlice.js";
+import { loginUserSlice } from "../redux/slice/loginUserSlice.js";
 import Joi from "joi";
 import toast from "react-hot-toast";
 import "../Global.css";
@@ -28,19 +29,38 @@ const schema = Joi.object({
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { users } = useSelector((state) => state.register);
-  const [error, setError] = useState("");
+  const { isLoading, isAuthenticated, error: reduxError, hasPin } = useSelector(
+    (state) => state.auth
+  );
+  // const { users } = useSelector((state) => state.register);
+  // const [error, setError] = useState("");
+  // const [FormData, setFormData] = useState({
+  //   email: "",
+  //   password: "",
+  // });
+  const [localValidationError, setLocalValidationError] = useState("");
   const [FormData, setFormData] = useState({
     email: "",
     password: "",
   });
 
+  // useEffect(() => {
+  //   if (error) {
+  //     const { error: validationError } = schema.validate(FormData);
+  //     if (!validationError) setError("");
+  //   }
+  // }, [FormData]);
   useEffect(() => {
-    if (error) {
-      const { error: validationError } = schema.validate(FormData);
-      if (!validationError) setError("");
+    if (isAuthenticated) {
+      if (!hasPin) {
+        toast.success("Login berhasil, silakan buat PIN keamanan Anda");
+        navigate("/auth/enterpin");
+      } else {
+        toast.success("Selamat Datang Kembali!");
+        navigate("/dashboard");
+      }
     }
-  }, [FormData]);
+  }, [isAuthenticated, hasPin, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,42 +68,54 @@ function Login() {
       ...prev,
       [name]: value,
     }));
+    setLocalValidationError("");
   };
 
   const handleLogin = (e) => {
     e.preventDefault();
     const { error: validationError } = schema.validate(FormData);
 
+    // if (validationError) {
+    //   setError(validationError.details[0].message);
+    //   return;
+    // }
     if (validationError) {
-      setError(validationError.details[0].message);
+      setLocalValidationError(validationError.details[0].message);
       return;
     }
-
-    const foundUser = users.find(
-      (user) =>
-        user.email === FormData.email && user.password === FormData.password,
+    dispatch(
+      loginUserSlice({
+        email: FormData.email,
+        password: FormData.password,
+      })
     );
 
-    if (!foundUser) {
-      setError("Email dan Password salah!");
-      dispatch(loginFailed("Invalid Credentials"));
-      return;
-    }
+    // const foundUser = users.find(
+    //   (user) =>
+    //     user.email === FormData.email && user.password === FormData.password,
+    // );
 
-    if (!foundUser.pin) {
-      dispatch(loginSuccess(foundUser));
-      toast.success(`Login berhasil, silakan buat PIN keamanan Anda`);
-      setTimeout(() => {
-        navigate("/auth/enterpin");
-      }, 1000);
-    } else {
-      dispatch(loginSuccess(foundUser));
-      toast.success(`Selamat Datang Kembali!`);
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
-    }
+    // if (!foundUser) {
+    //   setError("Email dan Password salah!");
+    //   dispatch(loginFailed("Invalid Credentials"));
+    //   return;
+    // }
+
+    // if (!foundUser.pin) {
+    //   dispatch(loginSuccess(foundUser));
+    //   toast.success(`Login berhasil, silakan buat PIN keamanan Anda`);
+    //   setTimeout(() => {
+    //     navigate("/auth/enterpin");
+    //   }, 1000);
+    // } else {
+    //   dispatch(loginSuccess(foundUser));
+    //   toast.success(`Selamat Datang Kembali!`);
+    //   setTimeout(() => {
+    //     navigate("/dashboard");
+    //   }, 1000);
+    // }
   };
+  const displayError = localValidationError || reduxError;
 
   return (
     <div className="md:bg-primary flex min-h-screen">
@@ -145,8 +177,8 @@ function Login() {
             />
           </div>
           <div className="h-2 w-full">
-            {error && (
-              <p className="w-full text-sm font-medium text-red-500">{error}</p>
+            {displayError && (
+              <p className="w-full text-sm font-medium text-red-500">{displayError}</p>
             )}
           </div>
           <ButtonSubmit label="Login" />
