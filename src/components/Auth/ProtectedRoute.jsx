@@ -1,19 +1,17 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth.jsx";
-import toast from "react-hot-toast";
-import { replace } from "react-router";
-import { useEffect } from "react";
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const ProtectedRoute = () => {
-  const { isLogin, currentUser } = useAuth();
-  const location = useLocation();
-  if (!isLogin) {
+  const { isAuthenticated, token, hasPin } = useSelector((state) => state.auth);
+
+  if (!isAuthenticated || !token) {
     return <Navigate to="/auth" replace />;
   }
-
-  if (!currentUser?.pin && location.pathname !== "/auth/enterpin") {
+  if (!hasPin) {
     return <Navigate to="/auth/enterpin" replace />;
   }
+
 
   return <Outlet />;
 };
