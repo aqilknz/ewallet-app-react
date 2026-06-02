@@ -10,22 +10,22 @@ function ChangePin() {
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state) => state.auth);
 
-  const { 
-    pin: oldPin, 
-    inputRefs: oldInputRefs, 
-    handleChange: handleOldChange, 
-    handleKeyDown: handleOldKeyDown, 
-    pinString: oldPinString, 
-    resetPin: resetOldPin 
+  const {
+    pin: oldPin,
+    inputRefs: oldInputRefs,
+    handleChange: handleOldChange,
+    handleKeyDown: handleOldKeyDown,
+    pinString: oldPinString,
+    resetPin: resetOldPin
   } = usePinLogic(6);
 
-  const { 
-    pin: newPin, 
-    inputRefs: newInputRefs, 
-    handleChange: handleNewChange, 
-    handleKeyDown: handleNewKeyDown, 
-    pinString: newPinString, 
-    resetPin: resetNewPin 
+  const {
+    pin: newPin,
+    inputRefs: newInputRefs,
+    handleChange: handleNewChange,
+    handleKeyDown: handleNewKeyDown,
+    pinString: newPinString,
+    resetPin: resetNewPin
   } = usePinLogic(6);
 
   const handleSubmit = (e) => {
@@ -81,7 +81,7 @@ function ChangePin() {
         </p>
 
         <form onSubmit={handleSubmit} className="mx-auto flex max-w-md flex-col gap-8">
-          
+
           <div className="flex flex-col items-center">
             <label className="mb-4 text-sm font-semibold text-gray-700">Enter Existing PIN</label>
             <PinInput

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 // import { loginSuccess, loginFailed } from "../redux/slice/authSlice.js";
-import { loginUserSlice } from "../redux/slice/loginUserSlice.js";
+import { loginUser } from "../redux/slice/loginUserSlice.js";
 import Joi from "joi";
 import toast from "react-hot-toast";
 import "../Global.css";
@@ -84,7 +84,7 @@ function Login() {
       return;
     }
     dispatch(
-      loginUserSlice({
+      loginUser({
         email: FormData.email,
         password: FormData.password,
       })
@@ -165,6 +165,7 @@ function Login() {
               path="/icons/email.svg"
               onChange={handleChange}
               value={FormData.email}
+              disabled={isLoading}
             />
             <InputForm
               text="Password"
@@ -174,6 +175,7 @@ function Login() {
               path="/icons/Password.svg"
               onChange={handleChange}
               value={FormData.password}
+              disabled={isLoading}
             />
           </div>
           <div className="h-2 w-full">

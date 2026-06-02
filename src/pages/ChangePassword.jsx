@@ -11,7 +11,7 @@ import ButtonSubmit from "../components/Auth/ButtonSubmit";
 
 function ChangePassword() {
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.loginUser || state.auth);
 
   const [formData, setFormData] = useState({
     existingPassword: "",
@@ -90,6 +90,7 @@ function ChangePassword() {
               value={formData.existingPassword}
               onChange={handleInputChange}
               path="/icons/Password.svg"
+              disabled={isLoading}
             />
             <InputForm
               text="New Password"
@@ -99,6 +100,7 @@ function ChangePassword() {
               value={formData.newPassword}
               onChange={handleInputChange}
               path="/icons/Password.svg"
+              disabled={isLoading}
             />
             <InputForm
               text="Confirm New Password"
@@ -108,6 +110,7 @@ function ChangePassword() {
               value={formData.confirmPassword}
               onChange={handleInputChange}
               path="/icons/Password.svg"
+              disabled={isLoading}
             />
           </div>
           <div className="h-2 w-full">
