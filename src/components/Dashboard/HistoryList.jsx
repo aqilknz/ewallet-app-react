@@ -1,136 +1,167 @@
-import React, { useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router";
-import { useSelector, useDispatch } from "react-redux";
-// import { DataHistory } from './data/DataHistory';
-import { deleteTransaction } from "../../redux/slice/transactionSlice";
+import React from "react";
+import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { bankOpt } from "./constant/BankOpt.jsx";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:9000/ewallet";
+const getProfileImage = (photoPath) => {
+  if (!photoPath) return "/icons/Profile/User.svg";
+  if (photoPath.startsWith("http")) return photoPath;
+
+  let fileName = photoPath;
+  if (fileName.includes("/")) {
+    const parts = fileName.split("/");
+    fileName = parts[parts.length - 1];
+  }
+
+  return `${API_BASE_URL}/img/profiles/${fileName}`;
+};
+
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  })
+    .format(value || 0)
+    .replace("IDR", "Rp.");
+};
 
 function HistoryList() {
+  const { recentTransactions = [], historyMeta } = useSelector(
+    (state) => state.dashboard
+  );
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const search = (searchParams.get("search") || "").toLowerCase();
-  const { transactions } = useSelector((state) => state.transaction);
-  const currentPage = parseInt(searchParams.get("page") || "1");
-  const itemsPerPage = 5;
-  const filteredData = useMemo(() => {
-    return transactions.filter(
-      (item) =>
-        item.name?.toLowerCase().includes(search) ||
-        item.telp?.toLowerCase().includes(search),
-    );
-  }, [search, transactions]);
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (newPage) => {
-    setSearchParams({ search, page: newPage.toString() });
+    if (newPage >= 1 && newPage <= (historyMeta?.total_page || 1)) {
+      const currentSearch = searchParams.get("search") || "";
+      setSearchParams({ search: currentSearch, page: newPage.toString() });
+    }
   };
-  const handleDelete = (e, id) => {
-    e.stopPropagation();
-    dispatch(deleteTransaction(id));
+
+  const handleDeleteClick = () => {
+    toast.error("Riwayat transaksi tidak dapat dihapus.");
   };
-  return (
-    <div className="w-full">
-      <div className="overflow-x-auto">
-        <table className="w-full border-separate border-spacing-y-3">
-          <tbody>
-            {currentItems.length > 0 ? (
-              currentItems.map((item) => {
-                const isPos = item.pos;
 
-                return (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-secondary cursor-pointer bg-white transition-colors odd:bg-gray-100"
-                    // onClick={() => navigate(`/transfer/detail?id=${item.id}`)}
-                  >
-                    <td className="w-16 p-2">
-                      <img
-                        src={item.img}
-                        alt={item.name}
-                        className="h-10 w-10"
-                      />
-                    </td>
-
-                    <td className="p-2 text-center font-bold">{item.name}</td>
-
-                    <td className="p-2 text-center">{item.type}</td>
-
-                    <td className="p-2 text-center">
-                      <span
-                        className={`font-bold ${item.type.includes("Top Up") ? "text-green-500" : "text-red-500"}`}
-                      >
-                        {item.amount}
-                      </span>
-                    </td>
-
-                    <td className="w-16 p-2 text-center">
-                      <button onClick={(e) => handleDelete(e, item.id)}>
-                        <img
-                          src="/icons/Trash.svg"
-                          alt="delete"
-                          className="h-5 w-5 cursor-pointer"
-                        />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="5" className="py-10 text-center text-gray-400">
-                  Data tidak ditemukan
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+  if (recentTransactions.length === 0) {
+    return (
+      <div className="py-10 text-center text-sm text-gray-500">
+        No transaction history found.
       </div>
-      {totalPages > 1 && (
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 md:flex-row">
-          <p className="text-sm text-gray-500">
-            Showing {indexOfFirstItem + 1} to{" "}
-            {Math.min(indexOfLastItem, filteredData.length)} of{" "}
-            {filteredData.length} entries
-          </p>
+    );
+  }
 
-          <div className="flex items-center gap-2">
-            {/* Tombol Prev */}
+  return (
+    <div className="flex flex-col w-full">
+      <div className="flex flex-col overflow-hidden rounded-xl border border-gray-100">
+        {recentTransactions.map((t, index) => {
+          const isIncome = t.flow_type === "income" || t.flow_type === "topup";
+          const colorClass = isIncome ? "text-green-500" : "text-red-500";
+          const sign = isIncome ? "+" : "-";
+
+          let title = t.description;
+          let iconSrc = getProfileImage(t.photo);
+
+          if (t.transaction_type === "transfer_in") {
+            title = t.description.replace("Transfer masuk dari ", "");
+          } else if (t.transaction_type === "transfer_out") {
+            title = t.description.replace("Transfer keluar ke ", "");
+          } else if (t.transaction_type === "topup") {
+            const matchedBank = bankOpt.find((b) =>
+              t.description.toLowerCase().includes(b.name.toLowerCase())
+            );
+            if (matchedBank) {
+              title = matchedBank.name;
+              iconSrc = matchedBank.icon;
+            } else {
+              title = "Topup Saldo";
+              iconSrc = "/icons/topup-blue.svg";
+            }
+          }
+
+          return (
+            <div
+              key={t.id}
+              className={`flex items-center px-6 py-4 transition-colors ${index % 2 === 0 ? "bg-white" : "bg-[#F9F9F9]"
+                }`}
+            >
+              <div className="flex flex-1 items-center gap-4">
+                <img
+                  src={iconSrc}
+                  className="h-12 w-12 shrink-0 rounded-lg bg-gray-200 object-cover"
+                  alt="icon"
+                  onError={(e) => {
+                    e.target.src = "/icons/Profile/User.svg";
+                  }}
+                />
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <strong className="block truncate text-base font-medium text-gray-600">
+                  {title || "Unknown User"}
+                </strong>
+              </div>
+
+              <div className="hidden flex-1 text-center text-sm text-gray-500 sm:block">
+                {t.transaction_type === "topup" ? "-" : (t.phone || "-")}
+              </div>
+
+              <div
+                className={`flex-1 whitespace-nowrap text-center text-base font-medium ${colorClass}`}
+              >
+                {sign}{formatCurrency(t.amount)}
+              </div>
+
+              <div className="ml-6 shrink-0">
+                <button
+                  onClick={handleDeleteClick}
+                  className="cursor-pointer p-1 transition-opacity hover:opacity-70"
+                >
+                  <img src="/icons/Trash.svg" alt="delete" className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {historyMeta && (
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 text-sm text-gray-500 md:flex-row">
+          <div>
+            Show {recentTransactions.length} History of {historyMeta.total_records} History
+          </div>
+
+          <div className="flex items-center gap-4">
             <button
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
-              className="cursor-pointer rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-30"
+              onClick={() => handlePageChange(historyMeta.current_page - 1)}
+              disabled={historyMeta.current_page === 1}
+              className="font-medium transition-colors hover:text-blue-600 disabled:opacity-50 disabled:hover:text-gray-500"
             >
               Prev
             </button>
 
-            {/* Nomor Halaman */}
-            <div className="flex gap-1">
-              {[...Array(totalPages)].map((_, i) => {
-                const pageNum = i + 1;
-                return (
+            <div className="flex items-center gap-3">
+              {Array.from({ length: historyMeta.total_page }, (_, i) => i + 1).map(
+                (pageNum) => (
                   <button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`h-10 w-10 cursor-pointer rounded-lg text-sm font-semibold transition-all ${
-                      currentPage === pageNum
-                        ? "bg-blue-600 text-white shadow-md"
-                        : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
-                    }`}
+                    className={`font-medium transition-colors ${historyMeta.current_page === pageNum
+                      ? "font-bold text-blue-600"
+                      : "hover:text-blue-600"
+                      }`}
                   >
                     {pageNum}
                   </button>
-                );
-              })}
+                )
+              )}
             </div>
 
-            {/* Tombol Next */}
             <button
-              disabled={currentPage === totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-              className="cursor-pointer rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-30"
+              onClick={() => handlePageChange(historyMeta.current_page + 1)}
+              disabled={historyMeta.current_page === historyMeta.total_page}
+              className="font-medium transition-colors hover:text-blue-600 disabled:opacity-50 disabled:hover:text-gray-500"
             >
               Next
             </button>

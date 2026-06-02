@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 // import { logoutUser } from "../../redux/slice/authSlice";
 import { logoutUserSlice } from "../../redux/slice/loginUserSlice";
 import { useDispatch } from "react-redux";
@@ -8,13 +8,27 @@ import { Modal } from "./Modal";
 import toast from "react-hot-toast";
 
 function Header() {
-  // const { currentUser } = useSelector((state) => state.auth);
+  const { currentUser, isLoading } = useSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { isLoading } = useSelector((state) => state.auth);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:9000/ewallet";
+
+  const getProfileImage = (photoPath) => {
+    if (!photoPath) return "/icons/Profile/User.svg";
+    if (photoPath.startsWith("http")) return photoPath;
+
+    let fileName = photoPath;
+    if (fileName.includes("/")) {
+      const parts = fileName.split("/");
+      fileName = parts[parts.length - 1];
+    }
+
+    return `${API_BASE_URL}/img/profiles/${fileName}`;
+  }
   // function handleLogout() {
   //   toast("Sampai Jumpa Kembali! 👋", {
   //     duration: 1000,
@@ -32,8 +46,9 @@ function Header() {
         setIsLogoutModalOpen(false);
         navigate("/auth", { replace: true });
       })
-      .catch((err) => {
-        toast.error(err || "Sesi diakhiri");
+      .catch(() => {
+        // toast.error(err || "Sesi berakhir");
+        toast.success("Sampai Jumpa Kembali! 👋", { duration: 2000 });
         setIsLogoutModalOpen(false);
         navigate("/auth", { replace: true });
       });
@@ -55,10 +70,10 @@ function Header() {
             onClick={() => setIsOpen(!isOpen)}
           >
             <span className="hidden font-bold md:block">
-              {currentUser?.fullName || "User"}
+              {currentUser?.full_name || "User"}
             </span>
             <img
-              src={currentUser?.avatar || "/icons/Profile/User.svg"}
+              src={getProfileImage(currentUser?.photo || currentUser?.avatar)}
               className="h-10 w-10 rounded-full object-cover"
               alt="User"
             />
@@ -73,7 +88,7 @@ function Header() {
             <div className="absolute top-full right-0 z-10 mt-2 w-56 rounded-2xl border border-gray-100 bg-white py-3 shadow-xl md:hidden">
               <div className="space-y-1 px-2">
                 <span className="block py-2 text-center text-sm font-bold text-gray-700">
-                  {currentUser?.fullName || "User"}
+                  {currentUser?.full_name || "User"}
                 </span>
                 <Link
                   to="/dashboard"
@@ -126,7 +141,7 @@ function Header() {
       <Modal
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
-        // inner="max-w-sm w-full"
+      // inner="max-w-sm w-full"
       >
         <div className="rounded-2xl bg-white p-8 text-center shadow-xl">
           {/* <h2 className="text-2xl font-bold text-gray-900 mb-2">Konfirmasi Keluar</h2> */}
