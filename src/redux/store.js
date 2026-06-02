@@ -15,38 +15,24 @@ import storage from "redux-persist/es/storage";
 import transactionReducer from "./slice/transactionSlice";
 import authSliceReducer from "./slice/loginUserSlice"
 import registerSliceReducer from "./slice/registerUserSlice"
+import transactionUserReducer from "./slice/transactionUserSlice";
 
-// export const authPersistConfig = {
-//   key: "authSession",
-//   storage,
-//   whitelist: ["currentUser", "isAuthenticated"],
-// };
-
-// export const registerPersistConfig = {
-//   key: "registerSession",
-//   storage,
-//   whitelist: ["users"],
-// };
 export const authPersistConfig = {
   key: "authSession",
   storage,
-  whitelist: ["token", "hasPin", "isAuthenticated"],
+  whitelist: ["token", "hasPin", "isAuthenticated", "currentUser"],
 };
 export const transactionPersistConfig = {
   key: "transactionSession",
   storage,
-  whitelist: ["transactions", "pendingTransaction"], 
+  whitelist: ["pendingTransaction"],
 };
 
-// const rootReducer = combineReducers({
-//   auth: persistReducer(authPersistConfig, authReducer),
-//   register: persistReducer(registerPersistConfig, registerReducer),
-//   transaction: persistReducer(transactionPersistConfig, transactionReducer),
-// });
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authSliceReducer),
-  register: registerSliceReducer,
   transaction: persistReducer(transactionPersistConfig, transactionReducer),
+  register: registerSliceReducer,
+  dashboard: transactionUserReducer
 });
 
 export const store = configureStore({
