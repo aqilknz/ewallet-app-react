@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Build and Publish to GHCR
+        uses: actions/checkout@v5
+      - name: Build and Publish ${{github.repository}} to GHCR
         uses: macbre/push-to-ghcr@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          image_name: ${{ github.repository }}
+          image_name: ${{ github.repository }}/ewallet-app-react
