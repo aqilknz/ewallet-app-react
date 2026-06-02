@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { bankOpt } from "./constant/BankOpt.jsx";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:9000/ewallet";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const getProfileImage = (photoPath) => {
   if (!photoPath) return "/icons/Profile/User.svg";

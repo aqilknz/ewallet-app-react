@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 // import { logoutUser } from "../../redux/slice/authSlice";
 import { Modal } from "./Modal";
 import toast from "react-hot-toast";
-import { logoutUserSlice } from "../../redux/slice/loginUserSlice";
+import { logoutUser } from "../../redux/slice/loginUserSlice";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ const Sidebar = () => {
     //   dispatch(logoutUser());
     //   navigate("/auth", { replace: true });
     // }, 1000);
-    dispatch(logoutUserSlice())
+    dispatch(logoutUser())
       .unwrap()
       .then(() => {
         toast.success("Sampai Jumpa Kembali! 👋", { duration: 2000 });
@@ -61,10 +61,9 @@ const Sidebar = () => {
               key={item.name}
               to={item.path}
               className={({ isActive }) =>
-                `group flex items-center space-x-4 rounded-xl p-3 transition-all ${
-                  isActive
-                    ? "bg-primary text-white shadow-md"
-                    : "text-gray-500 hover:bg-blue-500 hover:text-white"
+                `group flex items-center space-x-4 rounded-xl p-3 transition-all ${isActive
+                  ? "bg-primary text-white shadow-md"
+                  : "text-gray-500 hover:bg-blue-500 hover:text-white"
                 }`
               }
             >
@@ -73,11 +72,10 @@ const Sidebar = () => {
                   <img
                     src={item.icon}
                     alt={item.name}
-                    className={`h-6 w-6 transition-all ${
-                      isActive
-                        ? "brightness-0 invert"
-                        : "group-hover:brightness-0 group-hover:invert"
-                    }`}
+                    className={`h-6 w-6 transition-all ${isActive
+                      ? "brightness-0 invert"
+                      : "group-hover:brightness-0 group-hover:invert"
+                      }`}
                   />
                   <span className="font-medium">{item.name}</span>
                 </>
@@ -112,12 +110,14 @@ const Sidebar = () => {
           <div className="flex gap-3 text-sm">
             <button
               onClick={handleLogout}
+              disabled={isLoading}
               className="w-full cursor-pointer rounded-xl bg-red-500 py-4 font-bold text-white shadow-lg shadow-red-100 transition hover:bg-red-600"
             >
               Ya, Keluar Sekarang
             </button>
             <button
               onClick={() => setIsLogoutModalOpen(false)}
+              disabled={isLoading}
               className="w-full cursor-pointer rounded-xl border-2 border-gray-100 py-4 font-bold text-gray-500 transition hover:bg-gray-200"
             >
               Batal

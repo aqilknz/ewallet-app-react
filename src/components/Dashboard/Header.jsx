@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 // import { logoutUser } from "../../redux/slice/authSlice";
-import { logoutUserSlice } from "../../redux/slice/loginUserSlice";
+import { logoutUser } from "../../redux/slice/loginUserSlice";
 import { useDispatch } from "react-redux";
 import { Modal } from "./Modal";
 import toast from "react-hot-toast";
@@ -39,7 +39,7 @@ function Header() {
   //   }, 1000);
   // }
   const handleLogout = () => {
-    dispatch(logoutUserSlice())
+    dispatch(logoutUser())
       .unwrap()
       .then(() => {
         toast.success("Sampai Jumpa Kembali! 👋", { duration: 2000 });
