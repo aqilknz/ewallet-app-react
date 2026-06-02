@@ -1,0 +1,15 @@
+name: Build and Deploy
+on:
+  push:
+    branches: [master]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Build and Publish to GHCR
+        uses: macbre/push-to-ghcr@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          image_name: ${{ github.repository }}
