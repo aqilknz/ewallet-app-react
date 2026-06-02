@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { loginAPI, logoutAPI, createPinAPI, getProfileAPI, updateProfileAPI, updatePasswordAPI, updatePinAPI } from "../../services/apiServices";
 
-export const loginUserSlice = createAsyncThunk(
+export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (credentials, { rejectWithValue }) => {
     try {
@@ -26,7 +26,7 @@ export const createPin = createAsyncThunk(
   }
 );
 
-export const logoutUserSlice = createAsyncThunk(
+export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
   async (_, { getState, rejectWithValue }) => {
     try {
@@ -113,35 +113,35 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Login
-      .addCase(loginUserSlice.pending, (state) => {
+      .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(loginUserSlice.fulfilled, (state, action) => {
+      .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
         state.hasPin = action.payload.has_pin;
         state.token = action.payload.token;
       })
-      .addCase(loginUserSlice.rejected, (state, action) => {
+      .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = false;
         state.error = action.payload;
       })
 
       // Logout
-      .addCase(logoutUserSlice.pending, (state) => {
+      .addCase(logoutUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(logoutUserSlice.fulfilled, (state) => {
+      .addCase(logoutUser.fulfilled, (state) => {
         state.isLoading = false;
         state.token = null;
         state.hasPin = false;
         state.isAuthenticated = false;
         state.currentUser = null; // Hapus profil saat logout
       })
-      .addCase(logoutUserSlice.rejected, (state, action) => {
+      .addCase(logoutUser.rejected, (state, action) => {
         state.isLoading = false;
         state.token = null;
         state.hasPin = false;
