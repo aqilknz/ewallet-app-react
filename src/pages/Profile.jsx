@@ -1,70 +1,100 @@
 import React, { useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useChangeProfile } from "../hooks/useChangeProfile.jsx";
-import { updateUserProfile } from "../redux/slice/registerSlice.js";
-import { loginSuccess } from "../redux/slice/authSlice.js";
+import { editUserProfile } from "../redux/slice/loginUserSlice.js";
 import toast from "react-hot-toast";
 import Input from "../components/Dashboard/Input.jsx";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:9000/ewallet";
+
 function Profile() {
   const dispatch = useDispatch();
-  const { currentUser } = useSelector((state) => state.auth);
+  const { currentUser, isLoading } = useSelector((state) => state.auth);
 
-  const { preview, error, handleFileChange, handleDelete } = useChangeProfile();
   const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
-    fullName: currentUser?.fullName || "",
+    fullName: currentUser?.fullName || currentUser?.full_name || "User",
     phone: currentUser?.phone || "",
   });
+
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [isPictureDeleted, setIsPictureDeleted] = useState(false);
+
+  if (!currentUser) {
+    return <div className="p-10 text-center text-gray-500">Memuat data profil...</div>;
+  }
+
+  const getCurrentProfileImage = () => {
+    if (preview) return preview;
+
+    const photo = currentUser?.photo || currentUser?.avatar;
+    if (!photo || isPictureDeleted) return "/icons/Profile/User.svg";
+    if (photo.startsWith("http")) return photo;
+
+    let fileName = photo;
+    if (fileName.includes("/")) {
+      const parts = fileName.split("/");
+      fileName = parts[parts.length - 1];
+    }
+
+    return `${API_BASE_URL}/img/profiles/${fileName}`;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Ukuran file maksimal 2MB!");
+        return;
+      }
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file));
+      setIsPictureDeleted(false);
+    }
+  };
+
+  const handleDeletePreview = () => {
+    setSelectedFile(null);
+    setPreview("/icons/Profile/User.svg");
+    setIsPictureDeleted(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleUpdateProfile = (e) => {
     e.preventDefault();
 
-    const isImageDeleted = preview === "/icons/Profile/User.svg";
-    const finalAvatar = isImageDeleted ? "" : preview || currentUser.avatar;
+    const dataToSubmit = new FormData();
+    dataToSubmit.append("fullname", formData.fullName);
+    dataToSubmit.append("phone", formData.phone);
 
-    const updatedData = {
-      username: currentUser.email,
-      fullName: formData.fullName,
-      phone: formData.phone,
-      avatar: preview || currentUser.avatar,
-    };
+    if (selectedFile) {
+      dataToSubmit.append("picture", selectedFile);
+    } else if (isPictureDeleted) {
+      dataToSubmit.append("delete_picture", "true");
+    }
 
-    dispatch(updateUserProfile(updatedData));
-    dispatch(
-      loginSuccess({
-        ...currentUser,
-        ...updatedData,
-      }),
-    );
+    const loadingToast = toast.loading("Menyimpan profil...");
 
-    toast.success("Profile updated successfully!");
-
-    // setFormData({
-    //     username: currentUser.email,
-    //     fullName: updatedData.fullName,
-    //     phone: updatedData.phone,
-    //     email: currentUser.email
-    // });
+    dispatch(editUserProfile(dataToSubmit))
+      .unwrap()
+      .then(() => {
+        toast.success("Profil berhasil diperbarui!", { id: loadingToast });
+        setSelectedFile(null);
+        setPreview(null);
+        setIsPictureDeleted(false);
+      })
+      .catch((err) => {
+        toast.error(err || "Gagal memperbarui profil", { id: loadingToast });
+      });
   };
-  // const handledelete = () => {
-  //     handleDelete();
 
-  //     dispatch(loginSuccess({
-  //         ...currentUser,
-  //         avatar: ""
-  //     }));
-
-  //     dispatch(loginSuccess(resetData));
-  //     toast.success("Profile picture removed");
-  // };
   return (
     <>
       <div className="mb-8 flex items-center gap-4">
@@ -74,6 +104,7 @@ function Profile() {
 
       <section className="flex flex-col items-start gap-2 lg:flex-row">
         <form
+          key={currentUser?.id || currentUser?.email}
           onSubmit={handleUpdateProfile}
           className="flex w-full flex-col gap-2 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-10"
         >
@@ -83,15 +114,14 @@ function Profile() {
             </h3>
 
             <div className="flex items-center gap-5">
-              <div className="flex h-[100px] w-[100px] items-center justify-center overflow-hidden rounded-xl border bg-gray-100">
+              <div className="flex h-[100px] w-[100px] items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-gray-50">
                 <img
-                  src={preview || currentUser?.avatar}
+                  src={getCurrentProfileImage()}
                   alt="avatar"
-                  className={
-                    !preview && !currentUser?.avatar
-                      ? "w-16"
-                      : "h-full w-full object-cover"
-                  }
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    e.target.src = "/icons/Profile/User.svg";
+                  }}
                 />
               </div>
 
@@ -101,43 +131,41 @@ function Profile() {
                   ref={fileInputRef}
                   onChange={handleFileChange}
                   className="hidden"
-                  accept="image/*"
+                  accept=".jpg, .jpeg, .png"
                 />
 
                 <button
                   type="button"
                   onClick={() => fileInputRef.current.click()}
-                  className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:brightness-110"
+                  disabled={isLoading}
+                  className="flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
                 >
                   <img
                     src="/icons/Profile/edit.svg"
                     alt="ganti foto profile"
-                    className="w-6"
+                    className="w-5"
                   />
                   Change Profile
                 </button>
 
                 <button
                   type="button"
-                  onClick={handleDelete}
-                  className="flex items-center gap-2 rounded-md border border-red-500 px-4 py-2 text-sm font-semibold text-red-500 transition-all hover:bg-red-500 hover:text-white"
+                  onClick={handleDeletePreview}
+                  disabled={isLoading}
+                  className="flex items-center justify-center gap-2 rounded-md border border-red-500 px-4 py-2 text-sm font-semibold text-red-500 transition-all hover:bg-red-50 disabled:opacity-50"
                 >
                   <img
                     src="/icons/Profile/Delete.svg"
                     alt="delete foto proile"
-                    className="w-6"
+                    className="w-5"
                   />
                   Delete Profile
                 </button>
-
-                {error && (
-                  <p className="text-xs font-medium text-red-500">{error}</p>
-                )}
               </div>
             </div>
 
             <p className="mt-2 text-xs text-gray-500">
-              The profile picture must be 2MB or less
+              Format didukung: JPG, JPEG, PNG. Maksimal 2MB.
             </p>
           </div>
 
@@ -152,6 +180,7 @@ function Profile() {
               onChange={handleInputChange}
             />
           </div>
+
           <div className="my-2">
             <Input
               name="phone"
@@ -163,6 +192,7 @@ function Profile() {
               onChange={handleInputChange}
             />
           </div>
+
           <div className="my-2">
             <Input
               name="email"
@@ -191,7 +221,7 @@ function Profile() {
 
             <div>
               <label className="mb-1 block text-sm font-semibold text-gray-700">
-                Pin
+                Transaction PIN
               </label>
               <Link
                 to="/profile/changepin"
@@ -204,9 +234,10 @@ function Profile() {
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white shadow-md transition-all hover:brightness-110"
+            disabled={isLoading}
+            className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white shadow-md transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            Submit
+            {isLoading ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
         </form>
       </section>

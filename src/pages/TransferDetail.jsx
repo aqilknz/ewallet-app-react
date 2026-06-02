@@ -1,20 +1,18 @@
 import React from "react";
-import { useSearchParams } from "react-router";
-import Header from "../components/Dashboard/Header";
-import Sidebar from "../components/Dashboard/Sidebar";
+import { useLocation } from "react-router-dom";
 import TransferStep from "../components/Dashboard/TransferStep";
 import DetailTransfer from "../components/Dashboard/DetailTransfer";
-import { DataTransfer } from "../components/Dashboard/data/DataTransfer";
 
 function TransferDetail() {
-  const [searchParams] = useSearchParams();
-  const id = searchParams.get("id");
-  const selectedUser = DataTransfer.find((u) => u.id === parseInt(id));
-  console.log("ID dari URL:", id);
-  console.log("User yang ditemukan:", selectedUser);
+  const location = useLocation();
+  const selectedUser = location.state?.selectedUser;
 
   if (!selectedUser) {
-    return <div>Memuat data atau User tidak ditemukan...</div>;
+    return (
+      <div className="py-20 text-center text-gray-500">
+        User tidak ditemukan. Silakan kembali ke halaman Transfer dan pilih penerima.
+      </div>
+    );
   }
 
   return (

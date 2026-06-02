@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { changeUserPassword } from "../redux/slice/registerSlice";
-import { loginSuccess } from "../redux/slice/authSlice";
+// import { changeUserPassword } from "../redux/slice/registerSlice";
+// import { loginSuccess } from "../redux/slice/authSlice";
+import { updateUserPassword } from "../redux/slice/loginUserSlice";
 import toast from "react-hot-toast";
-import Header from "../components/Dashboard/Header";
-import Sidebar from "../components/Dashboard/Sidebar";
+// import Header from "../components/Dashboard/Header";
+// import Sidebar from "../components/Dashboard/Sidebar";
 import InputForm from "../components/Auth/InputForm";
 import ButtonSubmit from "../components/Auth/ButtonSubmit";
 
 function ChangePassword() {
   const dispatch = useDispatch();
-  const { currentUser } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     existingPassword: "",
@@ -37,37 +38,35 @@ function ChangePassword() {
       return setError("All fields are required");
     }
 
-    if (existingPassword !== currentUser.password) {
-      return setError("Existing password does not match");
-    }
-
     if (newPassword !== confirmPassword) {
       return setError("Confirm password does not match");
     }
 
-    const userKey = currentUser.email || currentUser.username;
+    if (newPassword.length < 8) {
+      return setError("New password must be at least 8 characters");
+    }
 
-    dispatch(
-      changeUserPassword({
-        username: userKey,
-        newPassword: newPassword,
-      }),
-    );
+    const payload = {
+      old_password: existingPassword,
+      new_password: newPassword,
+    };
 
-    dispatch(
-      loginSuccess({
-        ...currentUser,
-        password: newPassword,
-      }),
-    );
+    const loadingToast = toast.loading("Updating password...");
 
-    toast.success("Password changed successfully!");
-
-    setFormData({
-      existingPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
+    dispatch(updateUserPassword(payload))
+      .unwrap()
+      .then(() => {
+        toast.success("Password changed successfully!", { id: loadingToast });
+        setFormData({
+          existingPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      })
+      .catch((err) => {
+        toast.error(err || "Failed to change password", { id: loadingToast });
+        setError(err || "Failed to change password");
+      });
   };
 
   return (

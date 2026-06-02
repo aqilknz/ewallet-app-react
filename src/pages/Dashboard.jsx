@@ -1,14 +1,26 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDashboardData, fetchTransactionHistory } from "../redux/slice/transactionUserSlice.js";
 // import Header from '../components/Dashboard/Header.jsx'
 // import Sidebar from '../components/Dashboard/Sidebar.jsx'
 import Card from "../components/Dashboard/Card.jsx";
-import IncomeChart from "../components/Dashboard/IncomeChart.jsx";
+// import IncomeChart from "../components/Dashboard/IncomeChart.jsx";
+import TransactionChart from "../components/Dashboard/TransactionChart.jsx";
 import TransactionList from "../components/Dashboard/TransactionList.jsx";
 
 function Dashboard() {
-  const { currentUser } = useSelector((state) => state.auth);
+  const dispatch = useDispatch()
+  // const { currentUser } = useSelector((state) => state.auth);
+  const { data, isLoading } = useSelector((state) => state.dashboard);
+  const { token } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchDashboardData());
+      dispatch(fetchTransactionHistory({ limit: 5, page: 1 }))
+    }
+  }, [dispatch, token]);
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("id-ID", {
@@ -26,7 +38,7 @@ function Dashboard() {
           <Card
             icon="/icons/carddashboard/balance-icon.svg"
             text="Balance"
-            money={formatCurrency(currentUser?.balance)}
+            money={isLoading ? "Loading..." : formatCurrency(data?.balance)}
             persen="+2%"
             updown="/icons/carddashboard/rise-icons.svg"
             opt="3 days ago"
@@ -35,7 +47,7 @@ function Dashboard() {
           <Card
             icon="/icons/carddashboard/income-icon.svg"
             text="Income"
-            money={formatCurrency(currentUser?.income)}
+            money={isLoading ? "Loading..." : formatCurrency(data?.income)}
             persen="+2%"
             updown="/icons/carddashboard/rise-icons.svg"
             color="text-green-500"
@@ -43,7 +55,7 @@ function Dashboard() {
           <Card
             icon="/icons/carddashboard/expense-icon.svg"
             text="Expense"
-            money={formatCurrency(currentUser?.expense)}
+            money={isLoading ? "Loading..." : formatCurrency(data?.expense)}
             persen="+2%"
             updown="/icons/carddashboard/set-icon.svg"
             color="text-red-500"
@@ -51,7 +63,7 @@ function Dashboard() {
         </div>
 
         <article className="border-secondary overflow-y-auto rounded-2xl border-2 bg-white shadow-sm">
-          <div className="flex flex-col gap-4 px-8 py-6">
+          <div className="flex flex-col justify-center items-center md:flex-row md:justify-between gap-4 px-8 py-6">
             <h3 className="text-xl font-bold text-gray-800">Fast Service</h3>
             <div className="flex flex-wrap gap-4">
               <Link to="/topup">
@@ -79,7 +91,7 @@ function Dashboard() {
         </article>
 
         <div className="border-secondary rounded-2xl border-2 bg-white shadow-sm">
-          <IncomeChart />
+          <TransactionChart />
         </div>
       </div>
 

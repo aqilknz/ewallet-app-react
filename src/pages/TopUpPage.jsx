@@ -1,84 +1,61 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  setPendingTransaction,
-  addTransaction,
-} from "../redux/slice/transactionSlice";
-import { updateUserBalance } from "../redux/slice/registerSlice";
-import { loginSuccess } from "../redux/slice/authSlice";
+import { processTopUp, fetchDashboardData } from "../redux/slice/transactionUserSlice";
 import toast from "react-hot-toast";
 import BankOption from "../components/Dashboard/BankOption";
-import Header from "../components/Dashboard/Header";
-import Sidebar from "../components/Dashboard/Sidebar";
+import { bankOpt } from "../components/Dashboard/constant/BankOpt.jsx";
 
 const TopUpPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.dashboard);
 
-  const [selectedBank, setSelectedBank] = useState("");
+  const [selectedBank, setSelectedBank] = useState(null);
   const [amount, setAmount] = useState("");
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:9000/ewallet";
+
+  const getProfileImage = (photoPath) => {
+    if (!photoPath) return "/icons/Profile/User.svg";
+    if (photoPath.startsWith("http")) return photoPath;
+
+    let fileName = photoPath;
+    if (fileName.includes("/")) {
+      const parts = fileName.split("/");
+      fileName = parts[parts.length - 1];
+    }
+
+    return `${API_BASE_URL}/img/profiles/${fileName}`;
+  }
 
   const nominal = Number(amount) || 0;
   const tax = nominal > 0 ? 4000 : 0;
   const total = nominal + tax;
 
-  const bankOpt = [
-    { id: "bri", name: "Bank Rakyat Indonesia", icon: "/icons/bank/bri.svg" },
-    { id: "dana", name: "Dana", icon: "/icons/bank/dana.svg" },
-    { id: "bca", name: "Bank Central Asia", icon: "/icons/bank/bca.svg" },
-    { id: "gopay", name: "Gopay", icon: "/icons/bank/gopay.svg" },
-    { id: "ovo", name: "OVO", icon: "/icons/bank/ovo.svg" },
-  ];
-
   const handleTopUpSubmit = () => {
     if (nominal < 10000) return toast.error("Minimal Top Up Rp 10.000");
-    if (!selectedBank)
-      return toast.error("Pilih metode pembayaran terlebih dahulu");
-    const bankDetail = bankOpt.find((b) => b.id === selectedBank);
+    if (!selectedBank) return toast.error("Pilih metode pembayaran terlebih dahulu");
 
-    dispatch(
-      updateUserBalance({
-        username: currentUser.email,
-        amount: nominal,
-        type: "topup",
-      }),
-    );
-    dispatch(
-      loginSuccess({
-        ...currentUser,
-        balance: (currentUser.balance || 0) + nominal,
-        income: (currentUser.income || 0) + nominal,
-      }),
-    );
-    dispatch(
-      setPendingTransaction({
-        type: "topup",
-        amount: nominal,
-        total: total,
-        bank: selectedBank,
-      }),
-    );
-    const formattedAmount = new Intl.NumberFormat("id-ID").format(nominal);
-    dispatch(
-      addTransaction({
-        name: `Top Up ${bankDetail?.name}`,
-        type: "Top Up",
-        amount: `+Rp${formattedAmount}`,
-        img: bankDetail?.icon || "/icons/topupw.svg",
-      }),
-    );
+    const payload = {
+      amount: nominal,
+      payment_method_id: selectedBank,
+    };
 
-    // toast.loading("Menuju verifikasi PIN...", { duration: 1000 });
-    toast.success("Top Up successfully!", { duration: 1000 });
-    // dispatch(clearPendingTransaction({
+    const loadingToast = toast.loading("Memproses Top Up...");
 
-    // }))
-    setAmount("");
-    setSelectedBank("");
-
-    setTimeout(() => navigate("/dashboard"), 1000);
+    dispatch(processTopUp(payload))
+      .unwrap()
+      .then(() => {
+        toast.success("Top Up Berhasil!", { id: loadingToast, duration: 2000 });
+        dispatch(fetchDashboardData());
+        setAmount("");
+        setSelectedBank(null);
+        setTimeout(() => navigate("/dashboard"), 1000);
+      })
+      .catch((err) => {
+        toast.error(err || "Gagal memproses Top Up", { id: loadingToast });
+      });
   };
 
   return (
@@ -95,23 +72,24 @@ const TopUpPage = () => {
             </h3>
             <div className="flex items-center gap-5 rounded-xl bg-gray-50 p-4">
               <img
-                src={currentUser?.avatar || "/icons/Profile/User.svg"}
+                src={getProfileImage(currentUser?.photo || currentUser?.avatar)}
                 alt="profile"
                 className="h-14 w-14 rounded-lg object-cover"
+                onError={(e) => { e.target.src = "/icons/Profile/User.svg" }}
               />
               <div className="flex flex-col gap-1">
                 <strong className="text-lg text-gray-800">
-                  {currentUser?.fullName}
+                  {currentUser?.fullName || currentUser?.full_name || "User"}
                 </strong>
                 <span className="text-sm text-gray-500">
-                  {currentUser?.phone}
+                  {currentUser?.phone || "-"}
                 </span>
                 <span className="inline-flex w-fit items-center gap-1 rounded-md bg-blue-600 px-2 py-1 text-[12px] text-white">
                   <img
                     src="/icons/verified.svg"
                     alt="verified"
                     className="h-4 w-4"
-                  />{" "}
+                  />
                   Verified
                 </span>
               </div>
@@ -161,12 +139,12 @@ const TopUpPage = () => {
         </section>
 
         <section className="sticky top-8 w-full flex-shrink-0 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:w-[320px] xl:w-[350px]">
-          <h3 className="mb-6 text-lg font-semibold text-gray-900">Payment</h3>
+          <h3 className="mb-6 text-lg font-semibold text-gray-900">Payment Summary</h3>
           <div className="mb-6 flex flex-col gap-4">
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Order</span>
               <strong className="text-gray-800">
-                Idr. {nominal.toLocaleString()}
+                Idr. {nominal.toLocaleString("id-ID")}
               </strong>
             </div>
             <div className="flex justify-between text-sm">
@@ -176,24 +154,25 @@ const TopUpPage = () => {
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Tax</span>
               <strong className="text-gray-800">
-                Idr. {tax.toLocaleString()}
+                Idr. {tax.toLocaleString("id-ID")}
               </strong>
             </div>
             <hr className="border-gray-200" />
             <div className="flex justify-between text-base font-bold text-gray-900">
               <span>Sub Total</span>
-              <span>Idr. {total.toLocaleString()}</span>
+              <span>Idr. {total.toLocaleString("id-ID")}</span>
             </div>
           </div>
 
           <button
             onClick={handleTopUpSubmit}
-            className="w-full rounded-xl bg-blue-600 py-3.5 font-semibold text-white transition hover:bg-blue-700"
+            disabled={isLoading}
+            className="w-full rounded-xl bg-blue-600 py-3.5 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Submit
+            {isLoading ? "Processing..." : "Submit"}
           </button>
 
-          <p className="mt-4 text-xs leading-relaxed text-gray-400 italic">
+          <p className="mt-4 text-xs leading-relaxed text-gray-400 italic text-center">
             *Get Discount if you pay with Bank Central Asia
           </p>
         </section>
