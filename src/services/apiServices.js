@@ -2,7 +2,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 // API Autentikasi
 export const loginAPI = async (credentials) => {
-  const response = await fetch(`${API_URL}/ewallet/auth`, {
+  const response = await fetch(`${API_URL}/auth`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
