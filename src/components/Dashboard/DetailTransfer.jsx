@@ -1,70 +1,74 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, Link } from "react-router-dom";
 import { Modal } from "./Modal.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import ButtonSubmit from "../Auth/ButtonSubmit.jsx";
 import InputForm from "../Auth/InputForm.jsx";
 import PinInput from "../Auth/PinInput.jsx";
 import { usePinLogic } from "../../hooks/usePinLogic.jsx";
-import { addTransaction } from "../../redux/slice/transactionSlice.js";
-import { loginSuccess } from "../../redux/slice/authSlice.js";
-import { updateTransfer } from "../../redux/slice/registerSlice.js";
+import { processTransfer, fetchDashboardData } from "../../redux/slice/transactionUserSlice.js";
 import toast from "react-hot-toast";
 
 function DetailTransfer({ user }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { currentUser } = useSelector((state) => state.auth);
-  const { pin, inputRefs, handleChange, handleKeyDown, resetPin, pinString } =
-    usePinLogic(6);
+  const { isLoading } = useSelector((state) => state.dashboard);
+  const { pin, inputRefs, handleChange, handleKeyDown, resetPin, pinString } = usePinLogic(6);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState("input");
   const [amount, setAmount] = useState("");
+  const [notes, setNotes] = useState("");
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:9000/ewallet";
+
+  const getProfileImage = (photoPath) => {
+    if (!photoPath) return "/icons/Profile/User.svg";
+    if (photoPath.startsWith("http")) return photoPath;
+
+    let fileName = photoPath;
+    if (fileName.includes("/")) {
+      const parts = fileName.split("/");
+      fileName = parts[parts.length - 1];
+    }
+
+    return `${API_BASE_URL}/img/profiles/${fileName}`;
+  }
+
   const handleOpenModal = (e) => {
     e.preventDefault();
-    if (!amount || amount <= 0) {
-      return toast.error("Silakan masukkan nominal transfer!");
+    if (!amount || amount < 10000) {
+      return toast.error("Minimal nominal transfer adalah Rp 10.000");
     }
     setIsModalOpen(true);
     setStatus("input");
   };
 
   const handleConfirmPin = () => {
-    if (pinString === currentUser.pin) {
-      const nominal = Number(amount);
-      if (currentUser.balance < nominal) {
-        setStatus("input");
-        resetPin();
-        return toast.error("Saldo Anda tidak mencukupi!");
-      }
-      setStatus("success");
-
-      const formattedAmount = new Intl.NumberFormat("id-ID").format(amount);
-      dispatch(
-        addTransaction({
-          name: user?.name || "Unknown User",
-          type: "Transfer",
-          amount: `-Rp${formattedAmount}`,
-          img: user?.path || "/images/Customer.svg",
-        }),
-      );
-      dispatch(
-        updateTransfer({
-          username: currentUser.email,
-          amount: nominal,
-        }),
-      );
-      dispatch(
-        loginSuccess({
-          ...currentUser,
-          balance: (currentUser.balance || 0) - nominal,
-          expense: (currentUser.expense || 0) + nominal,
-        }),
-      );
-    } else {
-      setStatus("failed");
+    if (pinString.length < 6) {
+      return toast.error("PIN harus 6 digit");
     }
+
+    const payload = {
+      receiver_id: user.id.toString(),
+      amount: Number(amount),
+      notes: notes,
+      pin: pinString,
+    };
+
+    const loadingToast = toast.loading("Memproses Transfer...");
+
+    dispatch(processTransfer(payload))
+      .unwrap()
+      .then(() => {
+        toast.dismiss(loadingToast);
+        setStatus("success");
+        dispatch(fetchDashboardData());
+      })
+      .catch((err) => {
+        toast.dismiss(loadingToast);
+        toast.error(err || "Gagal memproses Transfer");
+        setStatus("failed");
+      });
   };
 
   const closeModal = () => {
@@ -80,15 +84,18 @@ function DetailTransfer({ user }) {
 
           <div className="flex items-center gap-4 rounded-xl border border-gray-100 bg-[#E8E8E84D] p-4">
             <img
-              src={user?.path || "/images/Customer.svg"}
+              src={getProfileImage(user?.photo || user?.avatar)}
               alt="photo-profile"
               className="h-16 w-16 rounded-md object-cover"
+              onError={(e) => {
+                e.target.src = "/icons/Profile/User.svg";
+              }}
             />
             <div className="flex-1">
               <p className="text-md font-bold">
-                {user?.name || "Unknown User"}
+                {user?.full_name || user?.name || "Unknown User"}
               </p>
-              <p className="mb-1 text-sm text-gray-500">{user?.telp || "-"}</p>
+              <p className="mb-1 text-sm text-gray-500">{user?.phone || "-"}</p>
               <div className="flex w-fit items-center gap-2 rounded-lg bg-blue-600 px-3 py-1 text-xs text-white">
                 <img
                   src="/icons/verified.svg"
@@ -98,7 +105,10 @@ function DetailTransfer({ user }) {
                 <span>Verified</span>
               </div>
             </div>
-            <button className="cursor-pointer rounded-full p-2 transition-colors hover:bg-gray-200">
+            <button
+              type="button"
+              className="cursor-pointer rounded-full p-2 transition-colors hover:bg-gray-200"
+            >
               <img
                 src="/icons/Star.svg"
                 alt="favorite"
@@ -133,24 +143,23 @@ function DetailTransfer({ user }) {
             something
           </p>
           <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
             placeholder="Enter Some Notes"
-            className="w-full resize-none rounded-md border border-gray-200 bg-white p-4 text-sm placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full resize-none rounded-md border border-gray-200 bg-white p-4 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows="3"
+            maxLength={100}
           ></textarea>
         </div>
-        <ButtonSubmit label="Submit & Transfer" />
+        <ButtonSubmit label={isLoading ? "Processing..." : "Submit & Transfer"} disabled={isLoading} />
       </form>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        inner="max-w-lg md:w-full"
-      >
+
+      <Modal isOpen={isModalOpen} onClose={closeModal} inner="max-w-lg md:w-full">
         <div className="sticky justify-self-center rounded-2xl bg-white p-6">
-          <p className="mb-6 border-b pb-4 text-xs font-bold tracking-widest text-gray-400 uppercase">
-            Transfer to {user?.name}
+          <p className="mb-6 border-b pb-4 text-xs font-bold uppercase tracking-widest text-gray-400">
+            Transfer to {user?.full_name || user?.name || "Unknown"}
           </p>
 
-          {/* input pin */}
           {status === "input" && (
             <div className="text-center">
               <h2 className="mb-2 text-xl font-bold md:text-2xl">
@@ -167,21 +176,20 @@ function DetailTransfer({ user }) {
               />
               <button
                 onClick={handleConfirmPin}
-                className="mt-4 w-full rounded-xl bg-blue-600 py-4 font-bold text-white"
+                disabled={isLoading}
+                className="mt-4 w-full rounded-xl bg-blue-600 py-4 font-bold text-white disabled:opacity-70"
               >
-                Next
+                {isLoading ? "Processing..." : "Next"}
               </button>
               <p className="mt-4 text-sm text-gray-500">
                 Forgot Your Pin?
-                <span className="cursor-pointer text-blue-600">
-                  {" "}
+                <span className="ml-1 cursor-pointer text-blue-600 hover:underline">
                   <Link to="/profile/changepin">Reset</Link>
                 </span>
               </p>
             </div>
           )}
 
-          {/* success */}
           {status === "success" && (
             <div className="py-4 text-center">
               <img
@@ -198,13 +206,17 @@ function DetailTransfer({ user }) {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="w-full rounded-xl bg-blue-600 py-3 font-bold text-white"
+                  className="w-full rounded-xl bg-blue-600 py-3 font-bold text-white hover:bg-blue-700"
                 >
                   Done
                 </button>
                 <button
-                  onClick={closeModal}
-                  className="w-full rounded-xl border border-blue-600 py-3 font-bold text-blue-600"
+                  onClick={() => {
+                    closeModal();
+                    setAmount("");
+                    setNotes("");
+                  }}
+                  className="w-full rounded-xl border border-blue-600 py-3 font-bold text-blue-600 hover:bg-blue-50"
                 >
                   Transfer Again
                 </button>
@@ -212,7 +224,6 @@ function DetailTransfer({ user }) {
             </div>
           )}
 
-          {/* failed */}
           {status === "failed" && (
             <div className="py-4 text-center">
               <img
@@ -224,7 +235,7 @@ function DetailTransfer({ user }) {
                 Oops Transfer <span className="text-red-500">Failed</span>
               </h2>
               <p className="mb-8 px-10 text-gray-500">
-                Sorry Theres is an issue for your transfer, try again later!
+                Sorry There is an issue for your transfer, please try again!
               </p>
               <div className="flex flex-col gap-3">
                 <button
@@ -232,13 +243,13 @@ function DetailTransfer({ user }) {
                     setStatus("input");
                     resetPin();
                   }}
-                  className="w-full rounded-xl bg-blue-600 py-3 font-bold text-white"
+                  className="w-full rounded-xl bg-blue-600 py-3 font-bold text-white hover:bg-blue-700"
                 >
                   Try Again
                 </button>
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="w-full rounded-xl border border-blue-600 py-3 font-bold text-blue-600"
+                  className="w-full rounded-xl border border-blue-600 py-3 font-bold text-blue-600 hover:bg-blue-50"
                 >
                   Back To Dashboard
                 </button>
