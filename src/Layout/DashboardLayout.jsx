@@ -1,7 +1,7 @@
 import Header from "../components/Dashboard/Header.jsx";
 import Sidebar from "../components/Dashboard/Sidebar.jsx";
 import { Outlet } from "react-router-dom";
-import { getProfile } from "../redux/slice/loginUserSlice.js";
+import { getProfile } from "../redux/slice/authUserSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 
