@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../Global.css";
 import HeaderLP from "../components/Landing/HeaderLP.jsx";
 import CardPartners from "../components/Landing/CardPartners.jsx";
@@ -6,30 +6,67 @@ import AboutApp from "../components/Landing/AboutApp.jsx";
 import SocialMedia from "../components/Landing/SocialMedia.jsx";
 import FeatureItem from "../components/Landing/FeatureItem.jsx";
 import CardCustomer from "../components/Landing/CardCustomer.jsx";
+import { useNavigate } from "react-router";
+import { useSelector } from "react-redux";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
+const customers = [
+  { id: 1, name: "Sherina Claw", review: "Best app ever used in my life!", path: "/images/Customer-1.svg" },
+  { id: 2, name: "James Bond", review: "Manage financial needs easily. 100% free!", path: "/images/Customer-2.svg" },
+  { id: 3, name: "Ujang Kayu", review: "Not going to move to another app. Thanks!", path: "/images/Customer-3.svg" },
+  { id: 4, name: "Rina Nose", review: "Sangat membantu buat bayar tagihan bulanan.", path: "/images/Customer-1.svg" },
+  { id: 5, name: "Budi Doremi", review: "User interfacenya keren dan sangat enteng.", path: "/images/Customer-2.svg" },
+  { id: 6, name: "Siti Badriah", review: "Top up saldo instan tanpa hambatan sama sekali.", path: "/images/Customer-3.svg" },
+  { id: 7, name: "Asep Knalpot", review: "Transfer ke sesama pengguna gratis ongkir eh admin!", path: "/images/Customer-1.svg" },
+  { id: 8, name: "Lesti Kejora", review: "Keamanannya luar biasa, saya merasa tenang.", path: "/images/Customer-2.svg" },
+];
 function LandingPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    AOS.init({ duration: 1000, once: true });
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % (customers.length - 2));
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, []);
+  const handleGetStarted = () => {
+    console.log("Tombol diklik! Auth status:", isAuthenticated);
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      navigate("/auth/register");
+    }
+  };
   return (
     <>
       <HeaderLP />
-      <div>
+      <div className="overflow-x-hidden">
         <section className="font-monserrat min-h-screen max-w-screen sm:flex sm:min-h-screen">
-          <div className="w-full bg-white sm:order-2 sm:flex sm:items-center sm:justify-center">
+          <div className="w-full bg-white sm:order-2 sm:flex sm:items-center sm:justify-center" data-aos="fade-left">
             <img
               src="/icons/right-lp.svg"
               alt="Landing Image"
               className="flex w-full flex-1 items-center justify-center object-contain"
             />
           </div>
-          <div className="flex w-full flex-col items-start justify-center gap-5 bg-white px-10 py-10 sm:order-1">
-            <h1 className="align-left text-4xl font-medium md:text-5xl xl:text-7xl">
+          <div className="flex w-full flex-col items-start justify-center gap-5 bg-white px-10 py-10 sm:order-1" data-aos="fade-right">
+            <h1 className="align-left text-4xl font-medium md:text-5xl xl:text-7xl leading-tight">
               Smart Way to Your Financial Business
             </h1>
             <p className="text-xl">
               We bring you a mobile app for banking problems that oftenly
               wasting much of your times.
             </p>
-            <button className="bg-primary cursor-pointer rounded-lg px-5 py-2 text-white">
-              Get Started
+            <button
+              onClick={handleGetStarted}
+              className="bg-primary hover:scale-105 transition-transform cursor-pointer rounded-lg px-8 py-3 text-white font-bold shadow-lg"
+            >
+              {isAuthenticated ? "Go to Dashboard" : "Get Started"}
             </button>
             <p>Available on</p>
             <div className="flex items-center justify-start gap-5">
@@ -130,44 +167,48 @@ function LandingPage() {
                   description="Zwallet come up with modern and sleek design and not complicated."
                 />
               </div>
-              <button className="text-primary w-full cursor-pointer rounded-xl bg-white px-12 py-4 text-lg font-bold transition-all hover:shadow-xl">
-                Get Started
+              <button
+                onClick={handleGetStarted}
+                className="bg-primary cursor-pointer rounded-lg px-5 py-2 text-white"
+              >
+                {isAuthenticated ? "Go to Dashboard" : "Get Started"}
               </button>
             </div>
           </div>
         </section>
-        <section className="bg-white px-10">
-          <div className="flex flex-col gap-10 py-20">
-            <h2 className="text-center text-4xl font-bold md:text-5xl">
-              Here From Our Customer
-            </h2>
-            <p className="text-center text-lg md:text-xl">
-              We always do our best for our customers to stay comfortable using
-              the applications we provide
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              <CardCustomer
-                path="/images/Customer-1.svg"
-                name="Sherina Claw"
-                rating="/icons/rating.svg"
-                review="“I use this app since 2 years ago and this is the best app that I’ve ever use in my entire life”"
-              />
-              <CardCustomer
-                path="/images/Customer-2.svg"
-                name="James Bond"
-                rating="/icons/rating.svg"
-                review="“I use Zwallet to manage all financial needs. It’s super easy to use and it’s 100% free app”"
-              />
-              <CardCustomer
-                path="/images/Customer-3.svg"
-                name="Ujang Kayu"
-                rating="/icons/rating.svg"
-                review="“Since I’m using this app, I’m not going to move to another similar app. Thank you Zwallet!”"
-              />
+        <section className="bg-gray-50 px-10 py-20">
+          <div className="flex flex-col gap-10">
+            <div className="text-center" data-aos="zoom-in">
+              <h2 className="text-4xl font-bold md:text-5xl mb-4">Here From Our Customer</h2>
+              <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+                We always do our best for our customers to stay comfortable using our applications.
+              </p>
+            </div>
+            <div className="relative overflow-hidden py-5">
+              <div 
+                className="flex transition-transform duration-700 ease-in-out gap-6"
+                style={{ transform: `translateX(-${currentIndex * 33.33}%)` }}
+              >
+                {customers.map((cust) => (
+                  <div key={cust.id} className="min-w-[100%] md:min-w-[48%] lg:min-w-[31%] flex-shrink-0">
+                    <CardCustomer
+                      path={cust.path}
+                      name={cust.name}
+                      rating="/icons/rating.svg"
+                      review={cust.review}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex justify-center gap-2">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className={`h-2 w-2 rounded-full ${currentIndex === i ? 'bg-primary' : 'bg-gray-300'}`}></div>
+                ))}
             </div>
           </div>
         </section>
-        <footer className="bg-primary flex h-full w-full flex-col text-white">
+        <footer className="bg-primary flex h-full w-full flex-col text-white" data-aos="fade-up">
           <div className="grid grid-cols-1 gap-10 px-10 py-16 md:grid-cols-2 lg:grid-cols-4">
             <div className="flex flex-col gap-3 md:flex-1">
               <div className="flex items-center gap-2">
