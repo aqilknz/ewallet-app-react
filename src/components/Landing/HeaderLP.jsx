@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom"; // Pastikan import dari 'react-router-dom'
+import { NavLink, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import "../../Global.css";
 
 function HeaderLP() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate()
+  const { isAuthenticated } = useSelector((state) => state.auth)
 
   const desktopBtnStyle =
     "px-6 py-2 border border-white rounded-lg hover:bg-white hover:text-primary transition-all cursor-pointer inline-block";
@@ -24,12 +27,23 @@ function HeaderLP() {
         </div>
 
         <div className="hidden items-center gap-4 md:flex">
-          <NavLink to="auth" className={desktopBtnStyle}>
-            Sign In
-          </NavLink>
-          <NavLink to="auth/register" className={desktopPrimaryBtnStyle}>
-            Sign Up
-          </NavLink>
+          {isAuthenticated ? (
+            <button
+              onClick={() => navigate("/dashboard")}
+              className={desktopPrimaryBtnStyle}
+            >
+              Go to Dashboard
+            </button>
+          ) : (
+            <>
+              <NavLink to="/auth" className={desktopBtnStyle}>
+                Sign In
+              </NavLink>
+              <NavLink to="/auth/register" className={desktopPrimaryBtnStyle}>
+                Sign Up
+              </NavLink>
+            </>
+          )}
         </div>
 
         <button
@@ -46,20 +60,34 @@ function HeaderLP() {
 
       {isOpen && (
         <div className="bg-primary absolute z-50 flex w-full flex-col items-center gap-4 border-t border-blue-400 py-5 shadow-xl md:hidden">
-          <NavLink
-            to="/auth"
-            className={mobileBtnStyle}
-            onClick={() => setIsOpen(false)}
-          >
-            Sign In
-          </NavLink>
-          <NavLink
-            to="auth/register"
-            className={mobilePrimaryBtnStyle}
-            onClick={() => setIsOpen(false)}
-          >
-            Sign Up
-          </NavLink>
+          {isAuthenticated ? (
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                navigate("/dashboard");
+              }}
+              className={mobilePrimaryBtnStyle}
+            >
+              Go to Dashboard
+            </button>
+          ) : (
+            <>
+              <NavLink
+                to="/auth"
+                className={mobileBtnStyle}
+                onClick={() => setIsOpen(false)}
+              >
+                Sign In
+              </NavLink>
+              <NavLink
+                to="/auth/register"
+                className={mobilePrimaryBtnStyle}
+                onClick={() => setIsOpen(false)}
+              >
+                Sign Up
+              </NavLink>
+            </>
+          )}
         </div>
       )}
     </header>
