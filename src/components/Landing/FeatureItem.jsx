@@ -11,7 +11,7 @@ import React from "react";
 
 function FeatureItem({ icon, title, description }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl p-2">
+    <div className="flex items-start gap-4 p-4 rounded-xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 hover:shadow-lg cursor-pointer">
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white">
         <img src={icon} alt={title} className="h-7 w-7 object-contain" />
       </div>
