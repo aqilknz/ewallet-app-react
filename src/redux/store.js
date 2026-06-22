@@ -26,8 +26,7 @@ export const transactionPersistConfig = {
 
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authSliceReducer),
-  transaction: persistReducer(transactionPersistConfig, transactionReducer),
-  dashboard: transactionUserReducer
+  dashboard: persistReducer(transactionPersistConfig, transactionUserReducer),
 });
 
 export const store = configureStore({
