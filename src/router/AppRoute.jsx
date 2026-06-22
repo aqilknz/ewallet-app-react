@@ -28,7 +28,7 @@ function AppRoute() {
   useScrollToTop();
   return (
     <>
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="auth">
