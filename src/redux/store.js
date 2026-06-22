@@ -10,11 +10,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/es/storage";
-// import authReducer from "./slice/authSlice";
-// import registerReducer from "./slice/registerSlice";
-import transactionReducer from "./slice/transactionSlice";
-import authSliceReducer from "./slice/loginUserSlice"
-import registerSliceReducer from "./slice/registerUserSlice"
+import authSliceReducer from "./slice/authUserSlice"
 import transactionUserReducer from "./slice/transactionUserSlice";
 
 export const authPersistConfig = {
@@ -31,7 +27,6 @@ export const transactionPersistConfig = {
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authSliceReducer),
   transaction: persistReducer(transactionPersistConfig, transactionReducer),
-  register: registerSliceReducer,
   dashboard: transactionUserReducer
 });
 
