@@ -1,6 +1,17 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:9000/ewallet";
 
 // API Autentikasi
+export const registerAPI = async (userData) => {
+  const response = await fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || data.message || "Gagal mendaftar");
+  return data;
+};
+
 export const loginAPI = async (credentials) => {
   const response = await fetch(`${API_URL}/auth`, {
     method: "POST",
@@ -194,5 +205,38 @@ export const updatePinAPI = async (payload, token) => {
 
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || data.message || "Gagal mengubah PIN");
+  return data;
+};
+
+export const forgotPasswordAPI = async (payload) => {
+  const response = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || data.message || "Gagal mengirim OTP");
+  return data;
+};
+
+export const verifyOtpAPI = async (payload) => {
+  const response = await fetch(`${API_URL}/auth/verify-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || data.message || "OTP tidak valid");
+  return data;
+};
+
+export const resetPasswordAPI = async (payload) => {
+  const response = await fetch(`${API_URL}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || data.message || "Gagal mereset password");
   return data;
 };
