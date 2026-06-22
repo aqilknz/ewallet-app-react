@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-// import { loginSuccess, loginFailed } from "../redux/slice/authSlice.js";
-import { loginUser } from "../redux/slice/loginUserSlice.js";
+import { loginUser } from "../redux/slice/authUserSlice.js";
 import Joi from "joi";
 import toast from "react-hot-toast";
 import "../Global.css";
@@ -32,24 +31,12 @@ function Login() {
   const { isLoading, isAuthenticated, error: reduxError, hasPin } = useSelector(
     (state) => state.auth
   );
-  // const { users } = useSelector((state) => state.register);
-  // const [error, setError] = useState("");
-  // const [FormData, setFormData] = useState({
-  //   email: "",
-  //   password: "",
-  // });
+
   const [localValidationError, setLocalValidationError] = useState("");
   const [FormData, setFormData] = useState({
     email: "",
     password: "",
   });
-
-  // useEffect(() => {
-  //   if (error) {
-  //     const { error: validationError } = schema.validate(FormData);
-  //     if (!validationError) setError("");
-  //   }
-  // }, [FormData]);
   useEffect(() => {
     if (isAuthenticated) {
       if (!hasPin) {
@@ -75,10 +62,6 @@ function Login() {
     e.preventDefault();
     const { error: validationError } = schema.validate(FormData);
 
-    // if (validationError) {
-    //   setError(validationError.details[0].message);
-    //   return;
-    // }
     if (validationError) {
       setLocalValidationError(validationError.details[0].message);
       return;
@@ -90,30 +73,6 @@ function Login() {
       })
     );
 
-    // const foundUser = users.find(
-    //   (user) =>
-    //     user.email === FormData.email && user.password === FormData.password,
-    // );
-
-    // if (!foundUser) {
-    //   setError("Email dan Password salah!");
-    //   dispatch(loginFailed("Invalid Credentials"));
-    //   return;
-    // }
-
-    // if (!foundUser.pin) {
-    //   dispatch(loginSuccess(foundUser));
-    //   toast.success(`Login berhasil, silakan buat PIN keamanan Anda`);
-    //   setTimeout(() => {
-    //     navigate("/auth/enterpin");
-    //   }, 1000);
-    // } else {
-    //   dispatch(loginSuccess(foundUser));
-    //   toast.success(`Selamat Datang Kembali!`);
-    //   setTimeout(() => {
-    //     navigate("/dashboard");
-    //   }, 1000);
-    // }
   };
   const displayError = localValidationError || reduxError;
 

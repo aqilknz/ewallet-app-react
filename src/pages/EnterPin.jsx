@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-// import { savePinToUser } from "../redux/slice/registerSlice";
-// import { loginSuccess } from "../redux/slice/authSlice";
-import { createPin } from "../redux/slice/loginUserSlice";
+import { createPin } from "../redux/slice/authUserSlice";
 import { usePinLogic } from "../hooks/usePinLogic";
 import toast from "react-hot-toast";
 
@@ -15,15 +13,9 @@ function EnterPin() {
   const dispatch = useDispatch();
   const { isAuthenticated, token, isLoading, hasPin } = useSelector((state) => state.auth);
 
-  // const { currentUser } = useSelector((state) => state.auth);
-  // const { pendingTransaction } = useSelector((state) => state.transaction);
-
   const { pin, inputRefs, handleChange, handleKeyDown, pinString } =
     usePinLogic(6);
 
-  // useEffect(() => {
-  //   if (!currentUser) navigate("/auth");
-  // }, [currentUser, navigate]);
   useEffect(() => {
     if (!isAuthenticated || !token) {
       navigate("/auth");

@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// import { changeUserPassword } from "../redux/slice/registerSlice";
-// import { loginSuccess } from "../redux/slice/authSlice";
-import { updateUserPassword } from "../redux/slice/loginUserSlice";
+import { updateUserPassword } from "../redux/slice/authUserSlice";
 import toast from "react-hot-toast";
-// import Header from "../components/Dashboard/Header";
-// import Sidebar from "../components/Dashboard/Sidebar";
 import InputForm from "../components/Auth/InputForm";
 import ButtonSubmit from "../components/Auth/ButtonSubmit";
 

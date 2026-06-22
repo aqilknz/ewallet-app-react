@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { usePinLogic } from "../hooks/usePinLogic";
-import { updateUserPin } from "../redux/slice/loginUserSlice";
+import { updateUserPin } from "../redux/slice/authUserSlice";
 import toast from "react-hot-toast";
 import ButtonSubmit from "../components/Auth/ButtonSubmit";
 import PinInput from "../components/Auth/PinInput";

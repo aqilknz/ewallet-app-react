@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { editUserProfile } from "../redux/slice/loginUserSlice.js";
+import { editUserProfile } from "../redux/slice/authUserSlice.js";
 import toast from "react-hot-toast";
 import Input from "../components/Dashboard/Input.jsx";
 

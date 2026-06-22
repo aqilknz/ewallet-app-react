@@ -3,15 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Joi from "joi";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-// import {
-//   registerStart,
-//   registerSuccess,
-//   registerFailed,
-// } from "../redux/slice/registerSlice.js";
-import {
-  registerUserSlice,
-  resetRegisterStatus,
-} from "../redux/slice/registerUserSlice.js";
+import { registerUser,resetRegisterStatus } from "../redux/slice/authUserSlice.js";
 
 import "../Global.css";
 import ButtonSubmit from "../components/Auth/ButtonSubmit.jsx";
@@ -23,10 +15,7 @@ function Register() {
   const dispatch = useDispatch();
 
   const [localValidationError, setLocalValidationError] = useState("");
-  const { isLoading, isSuccess, error: reduxError } = useSelector((state) => state.register);
-
-  // const [error, setError] = useState("");
-  // const { users, isLoading } = useSelector((state) => state.register);
+  const { isLoading, isRegisterSuccess, error: reduxError } = useSelector((state) => state.auth);
   const [FormData, setFormData] = useState({
     email: "",
     password: "",
@@ -54,12 +43,12 @@ function Register() {
   });
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isRegisterSuccess) {
       toast.success("Register Berhasil!");
       dispatch(resetRegisterStatus());
       navigate("/auth");
     }
-  }, [isSuccess, dispatch, navigate]);
+  }, [isRegisterSuccess, dispatch, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,37 +69,12 @@ function Register() {
       setLocalValidationError(validationError.details[0].message);
       return;
     }
-    // const isUserExist = users.find((user) => user.email === FormData.email);
-
-    // if (validationError) {
-    //   setError(validationError.details[0].message);
-    //   dispatch(registerFailed(validationError.details[0].message));
-    //   return;
-    // }
-    // if (isUserExist) {
-    //   setError("Email sudah terdaftar!");
-    //   dispatch(registerFailed("Email sudah terdaftar!"));
-    //   return;
-    // }
-
-    // dispatch(
-    //   registerSuccess({
-    //     username: FormData.email,
-    //     email: FormData.email,
-    //     password: FormData.password,
-    //   }),
-    // );
     dispatch(
-      registerUserSlice({
+      registerUser({
         email: FormData.email,
         password: FormData.password,
       })
     );
-
-    // toast.success(`Register Berhasil`);
-    // setTimeout(() => {
-    //   navigate("/auth");
-    // }, 1000);
   };
   const displayError = localValidationError || reduxError;
 
@@ -192,7 +156,8 @@ function Register() {
               <p className="w-full text-sm font-medium text-red-500">{displayError}</p>
             )}
           </div>
-          <ButtonSubmit label="Register" />
+          <ButtonSubmit label={isLoading ? "Loading..." : "Register"} 
+            disabled={isLoading}/>
         </form>
         <p className="text-center text-sm text-gray-500">
           <span>Have An Account? </span>
