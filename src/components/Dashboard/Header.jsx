@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 // import { logoutUser } from "../../redux/slice/authSlice";
-import { logoutUser } from "../../redux/slice/loginUserSlice";
+import { logoutUser } from "../../redux/slice/authUserSlice";
 import { useDispatch } from "react-redux";
 import { Modal } from "./Modal";
 import toast from "react-hot-toast";
@@ -29,15 +29,6 @@ function Header() {
 
     return `${API_BASE_URL}/img/profiles/${fileName}`;
   }
-  // function handleLogout() {
-  //   toast("Sampai Jumpa Kembali! 👋", {
-  //     duration: 1000,
-  //   });
-  //   setTimeout(() => {
-  //     dispatch(logoutUser());
-  //     navigate("/auth", { replace: true });
-  //   }, 1000);
-  // }
   const handleLogout = () => {
     dispatch(logoutUser())
       .unwrap()

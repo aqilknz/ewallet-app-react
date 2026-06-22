@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import { logoutUser } from "../../redux/slice/authSlice";
 import { Modal } from "./Modal";
 import toast from "react-hot-toast";
-import { logoutUser } from "../../redux/slice/loginUserSlice";
+import { logoutUser } from "../../redux/slice/authUserSlice";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -15,13 +15,6 @@ const Sidebar = () => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
-    // toast("Sampai Jumpa Kembali! 👋", {
-    //   duration: 1000,
-    // });
-    // setTimeout(() => {
-    //   dispatch(logoutUser());
-    //   navigate("/auth", { replace: true });
-    // }, 1000);
     dispatch(logoutUser())
       .unwrap()
       .then(() => {
