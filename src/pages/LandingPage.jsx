@@ -15,11 +15,11 @@ const customers = [
   { id: 1, name: "Sherina Claw", review: "Best app ever used in my life!", path: "/images/Customer-1.svg" },
   { id: 2, name: "James Bond", review: "Manage financial needs easily. 100% free!", path: "/images/Customer-2.svg" },
   { id: 3, name: "Ujang Kayu", review: "Not going to move to another app. Thanks!", path: "/images/Customer-3.svg" },
-  { id: 4, name: "Rina Nose", review: "Sangat membantu buat bayar tagihan bulanan.", path: "/images/Customer-1.svg" },
-  { id: 5, name: "Budi Doremi", review: "User interfacenya keren dan sangat enteng.", path: "/images/Customer-2.svg" },
-  { id: 6, name: "Siti Badriah", review: "Top up saldo instan tanpa hambatan sama sekali.", path: "/images/Customer-3.svg" },
-  { id: 7, name: "Asep Knalpot", review: "Transfer ke sesama pengguna gratis ongkir eh admin!", path: "/images/Customer-1.svg" },
-  { id: 8, name: "Lesti Kejora", review: "Keamanannya luar biasa, saya merasa tenang.", path: "/images/Customer-2.svg" },
+  { id: 4, name: "Rina Nose", review: "Sangat membantu buat bayar tagihan bulanan.", path: "/images/1.svg" },
+  { id: 5, name: "Budi Doremi", review: "User interfacenya keren dan sangat enteng.", path: "/images/1-2.svg" },
+  { id: 6, name: "Siti Badriah", review: "Top up saldo instan tanpa hambatan sama sekali.", path: "/images/1-3.svg" },
+  { id: 7, name: "Asep Knalpot", review: "Transfer ke sesama pengguna gratis ongkir eh admin!", path: "/images/Customer-2.svg" },
+  { id: 8, name: "Lesti Kejora", review: "Keamanannya luar biasa, saya merasa tenang.", path: "/images/3.svg" },
 ];
 function LandingPage() {
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ function LandingPage() {
   return (
     <>
       <HeaderLP />
-      <div className="overflow-x-hidden">
+      <div className="overflow">
         <section className="font-monserrat min-h-screen max-w-screen sm:flex sm:min-h-screen">
           <div className="w-full bg-white sm:order-2 sm:flex sm:items-center sm:justify-center" data-aos="fade-left">
             <img
@@ -169,7 +169,7 @@ function LandingPage() {
               </div>
               <button
                 onClick={handleGetStarted}
-                className="bg-primary cursor-pointer rounded-lg px-5 py-2 text-white"
+                className="bg-white hover:scale-105 transition-transform cursor-pointer rounded-lg px-5 py-2 font-bold text-primary"
               >
                 {isAuthenticated ? "Go to Dashboard" : "Get Started"}
               </button>
