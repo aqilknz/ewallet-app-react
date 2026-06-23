@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { usePinLogic } from "../hooks/usePinLogic";
-import { updateUserPin } from "../redux/slice/authUserSlice";
+import { updateUserPin, checkUserPin } from "../redux/slice/authUserSlice";
 import toast from "react-hot-toast";
 import ButtonSubmit from "../components/Auth/ButtonSubmit";
 import PinInput from "../components/Auth/PinInput";
@@ -9,43 +9,58 @@ import PinInput from "../components/Auth/PinInput";
 function ChangePin() {
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state) => state.auth);
+  const [step, setStep] = useState(1);
 
-  const {
-    pin: oldPin,
-    inputRefs: oldInputRefs,
-    handleChange: handleOldChange,
-    handleKeyDown: handleOldKeyDown,
-    pinString: oldPinString,
-    resetPin: resetOldPin
-  } = usePinLogic(6);
+  const oldPinLogic = usePinLogic(6);
+  const newPinLogic = usePinLogic(6);
+  const confirmPinLogic = usePinLogic(6);
 
-  const {
-    pin: newPin,
-    inputRefs: newInputRefs,
-    handleChange: handleNewChange,
-    handleKeyDown: handleNewKeyDown,
-    pinString: newPinString,
-    resetPin: resetNewPin
-  } = usePinLogic(6);
-
-  const handleSubmit = (e) => {
+  // Handler 1, pin lama
+  const handleStep1 = (e) => {
     e.preventDefault();
-
-    if (oldPinString.length < 6) {
+    if (oldPinLogic.pinString.length < 6) {
       return toast.error("Existing PIN must be 6 digits");
     }
+    const loadingToast = toast.loading("Verifying your PIN...");
+    dispatch(checkUserPin({ pin: oldPinLogic.pinString }))
+      .unwrap()
+      .then(() => {
+        toast.dismiss(loadingToast);
+        setStep(2);
+      })
+      .catch((err) => {
+        toast.error(err || "Incorrect Existing PIN", { id: loadingToast });
+        oldPinLogic.resetPin();
+      });
+  };
 
-    if (newPinString.length < 6) {
+  // Handler 2, validasi pin baru yee
+  const handleStep2 = (e) => {
+    e.preventDefault();
+    if (newPinLogic.pinString.length < 6) {
       return toast.error("New PIN must be 6 digits");
     }
-
-    if (oldPinString === newPinString) {
+    if (oldPinLogic.pinString === newPinLogic.pinString) {
       return toast.error("New PIN cannot be the same as the old PIN");
+    }
+    setStep(3);
+  };
+
+  // handle 3, validasi confirm dan API
+  const handleFinalSubmit = (e) => {
+    e.preventDefault();
+
+    if (confirmPinLogic.pinString.length < 6) {
+      return toast.error("Confirmation PIN must be 6 digits");
+    }
+
+    if (newPinLogic.pinString !== confirmPinLogic.pinString) {
+      return toast.error("New PIN and Confirmation PIN do not match!");
     }
 
     const payload = {
-      old_pin: oldPinString,
-      new_pin: newPinString,
+      old_pin: oldPinLogic.pinString,
+      new_pin: newPinLogic.pinString,
     };
 
     const loadingToast = toast.loading("Updating PIN...");
@@ -54,15 +69,20 @@ function ChangePin() {
       .unwrap()
       .then(() => {
         toast.success("PIN changed successfully!", { id: loadingToast });
-        resetOldPin();
-        resetNewPin();
+        oldPinLogic.resetPin();
+        newPinLogic.resetPin();
+        confirmPinLogic.resetPin();
+        setStep(1);
       })
       .catch((err) => {
         toast.error(err || "Failed to change PIN", { id: loadingToast });
-      }).finally(() => {
-        resetOldPin();
-        resetNewPin();
       });
+  };
+
+  const getSubtitle = () => {
+    if (step === 1) return "Step 1/3: Enter your existing PIN to verify your identity.";
+    if (step === 2) return "Step 2/3: Create a new 6-digit PIN.";
+    if (step === 3) return "Step 3/3: Confirm your new PIN to save changes.";
   };
 
   return (
@@ -77,35 +97,74 @@ function ChangePin() {
           Change PIN 👋
         </h3>
         <p className="mb-10 text-center text-sm text-gray-500">
-          Please save your pin because this so important.
+          {getSubtitle()}
         </p>
 
-        <form onSubmit={handleSubmit} className="mx-auto flex max-w-md flex-col gap-8">
+        <div className="mx-auto max-w-md">
+          {step === 1 && (
+            <form onSubmit={handleStep1} className="flex flex-col items-center animate-fadeIn">
+              <label className="mb-4 text-sm font-semibold text-gray-700">Existing PIN</label>
+              <PinInput
+                pin={oldPinLogic.pin}
+                inputRefs={oldPinLogic.inputRefs}
+                handleChange={oldPinLogic.handleChange}
+                handleKeyDown={oldPinLogic.handleKeyDown}
+              />
+              <div className="mt-8 w-full">
+                <ButtonSubmit label="Continue" />
+              </div>
+            </form>
+          )}
 
-          <div className="flex flex-col items-center">
-            <label className="mb-4 text-sm font-semibold text-gray-700">Enter Existing PIN</label>
-            <PinInput
-              pin={oldPin}
-              inputRefs={oldInputRefs}
-              handleChange={handleOldChange}
-              handleKeyDown={handleOldKeyDown}
-            />
-          </div>
+          {step === 2 && (
+            <form onSubmit={handleStep2} className="flex flex-col items-center animate-fadeIn">
+              <label className="mb-4 text-sm font-semibold text-primary">New PIN</label>
+              <PinInput
+                pin={newPinLogic.pin}
+                inputRefs={newPinLogic.inputRefs}
+                handleChange={newPinLogic.handleChange}
+                handleKeyDown={newPinLogic.handleKeyDown}
+              />
+              <div className="mt-8 flex w-full gap-3">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="w-1/3 rounded-xl border border-gray-300 py-3 font-semibold text-gray-600 transition-all hover:bg-gray-50"
+                >
+                  Back
+                </button>
+                <div className="flex-1">
+                  <ButtonSubmit label="Continue" />
+                </div>
+              </div>
+            </form>
+          )}
 
-          <div className="flex flex-col items-center border-t border-gray-100 pt-8">
-            <label className="mb-4 text-sm font-semibold text-gray-700">Enter New PIN</label>
-            <PinInput
-              pin={newPin}
-              inputRefs={newInputRefs}
-              handleChange={handleNewChange}
-              handleKeyDown={handleNewKeyDown}
-            />
-          </div>
-
-          <div className="mt-4">
-            <ButtonSubmit label={isLoading ? "Processing..." : "Save PIN"} disabled={isLoading} />
-          </div>
-        </form>
+          {step === 3 && (
+            <form onSubmit={handleFinalSubmit} className="flex flex-col items-center animate-fadeIn">
+              <label className="mb-4 text-sm font-semibold text-green-600">Confirm New PIN</label>
+              <PinInput
+                pin={confirmPinLogic.pin}
+                inputRefs={confirmPinLogic.inputRefs}
+                handleChange={confirmPinLogic.handleChange}
+                handleKeyDown={confirmPinLogic.handleKeyDown}
+              />
+              <div className="mt-8 flex w-full gap-3">
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => setStep(2)}
+                  className="w-1/3 rounded-xl border border-gray-300 py-3 font-semibold text-gray-600 transition-all hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Back
+                </button>
+                <div className="flex-1">
+                  <ButtonSubmit label={isLoading ? "Processing..." : "Save PIN"} disabled={isLoading} />
+                </div>
+              </div>
+            </form>
+          )}
+        </div>
       </section>
     </>
   );
