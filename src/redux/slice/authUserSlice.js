@@ -100,6 +100,18 @@ export const updateUserPin = createAsyncThunk(
     }
   }
 );
+export const checkUserPin = createAsyncThunk(
+  "auth/checkPin",
+  async (payload, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      const data = await checkProfilePinAPI(payload, token);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const initialState = {
   token: null,
@@ -124,6 +136,9 @@ const authSlice = createSlice({
     },
     resetRegisterStatus: (state) => {
       state.isRegisterSuccess = false;
+      state.error = null;
+    },
+    clearError: (state) => {
       state.error = null;
     },
   },
@@ -252,5 +267,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAuthForce, resetRegisterStatus } = authSlice.actions;
+export const { clearAuthForce, resetRegisterStatus, clearError } = authSlice.actions;
 export default authSlice.reducer;
