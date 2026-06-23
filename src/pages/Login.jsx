@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { loginUser } from "../redux/slice/authUserSlice.js";
+import { loginUser, clearError } from "../redux/slice/authUserSlice.js";
 import Joi from "joi";
 import toast from "react-hot-toast";
 import "../Global.css";
@@ -57,6 +57,11 @@ function Login() {
     }));
     setLocalValidationError("");
   };
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
 
   const handleLogin = (e) => {
     e.preventDefault();

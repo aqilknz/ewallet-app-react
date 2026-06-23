@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Joi from "joi";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser,resetRegisterStatus } from "../redux/slice/authUserSlice.js";
+import { registerUser, resetRegisterStatus, clearError } from "../redux/slice/authUserSlice.js";
 
 import "../Global.css";
 import ButtonSubmit from "../components/Auth/ButtonSubmit.jsx";
@@ -59,6 +59,11 @@ function Register() {
 
     setLocalValidationError("");
   };
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -156,8 +161,8 @@ function Register() {
               <p className="w-full text-sm font-medium text-red-500">{displayError}</p>
             )}
           </div>
-          <ButtonSubmit label={isLoading ? "Loading..." : "Register"} 
-            disabled={isLoading}/>
+          <ButtonSubmit label={isLoading ? "Loading..." : "Register"}
+            disabled={isLoading} />
         </form>
         <p className="text-center text-sm text-gray-500">
           <span>Have An Account? </span>
