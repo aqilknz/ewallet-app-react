@@ -240,3 +240,18 @@ export const resetPasswordAPI = async (payload) => {
   if (!response.ok) throw new Error(data.error || data.message || "Gagal mereset password");
   return data;
 };
+
+export const checkPinAPI = async (payload, token) => {
+  const response = await fetch(`${API_URL}/users/profile/checkpin`, { 
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || data.message || "PIN saat ini tidak cocok");
+  return data;
+};
