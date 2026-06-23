@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { 
-  forgotPasswordAPI, 
-  verifyOtpAPI, 
-  resetPasswordAPI 
+import {
+  forgotPasswordAPI,
+  verifyOtpAPI,
+  resetPasswordAPI
 } from "../services/apiServices";
 import InputForm from "../components/Auth/InputForm";
 import ButtonSubmit from "../components/Auth/ButtonSubmit";
+import OtpInput from "../components/Auth/OTP";
+import { usePinLogic } from "../hooks/usePinLogic";
 import "../Global.css";
 
 function ForgotPassword() {
   const navigate = useNavigate();
-  
+
   // State(1: Email, 2: OTP, 3: Reset Password)
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +26,15 @@ function ForgotPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [countdown, setCountdown] = useState(0);
+  const {
+    pin: otpArray,
+    inputRefs,
+    handleChange,
+    handleKeyDown,
+    handlePaste,
+    pinString: otpString,
+    resetPin: resetOtp
+  } = usePinLogic(6);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -32,11 +43,10 @@ function ForgotPassword() {
     }
   }, [countdown]);
 
-  // Handler unutk kirim Email OTP
   const handleSendOTP = async (e) => {
     e?.preventDefault();
     if (!email) return setErrorMessage("Email wajib diisi!");
-    
+
     setIsLoading(true);
     setErrorMessage("");
     try {
@@ -54,7 +64,7 @@ function ForgotPassword() {
   // Handler untuk verifikasi OTP
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
-    if (otp.length !== 6) return setErrorMessage("OTP harus 6 digit angka!");
+    if (otpString.length !== 6) return setErrorMessage("OTP harus 6 digit angka!");
 
     setIsLoading(true);
     setErrorMessage("");
@@ -64,6 +74,7 @@ function ForgotPassword() {
       setStep(3);
     } catch (error) {
       setErrorMessage(error.message);
+      resetOtp();
     } finally {
       setIsLoading(false);
     }
@@ -78,10 +89,10 @@ function ForgotPassword() {
     setIsLoading(true);
     setErrorMessage("");
     try {
-      await resetPasswordAPI({ 
-        email, 
-        new_password: newPassword, 
-        confirm_password: confirmPassword 
+      await resetPasswordAPI({
+        email,
+        new_password: newPassword,
+        confirm_password: confirmPassword
       });
       toast.success("Password berhasil diubah! Silakan login.");
       navigate("/auth");
@@ -137,21 +148,20 @@ function ForgotPassword() {
               </p>
             </div>
             <form onSubmit={handleVerifyOTP} className="flex flex-col gap-4">
-              <InputForm
-                text="OTP Code"
-                type="text"
-                placeholder="Enter 6-digit OTP"
-                name="otp"
-                path="/icons/Lock.png"
-                value={otp}
-                onChange={(e) => {
-                  setOtp(e.target.value);
-                  setErrorMessage("");
-                }}
-                maxLength="6"
+              <OtpInput
+                otp={otpArray}
+                inputRefs={inputRefs}
+                handleChange={handleChange}
+                handleKeyDown={handleKeyDown}
+                handlePaste={handlePaste}
               />
-              <div className="h-4">{errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}</div>
-              <ButtonSubmit label={isLoading ? "Verifying..." : "Verify OTP"} disabled={isLoading} />
+
+              <div className="h-4">{errorMessage && <p className="text-sm text-red-500 text-center">{errorMessage}</p>}</div>
+
+              <ButtonSubmit
+                label={isLoading ? "Verifying..." : "Verify OTP"}
+                disabled={isLoading || otpString.length < 6}
+              />
             </form>
             <div className="mt-4 text-center">
               {countdown > 0 ? (
