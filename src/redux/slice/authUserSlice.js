@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginAPI, logoutAPI, createPinAPI, getProfileAPI, updateProfileAPI, updatePasswordAPI, registerAPI, updatePinAPI } from "../../services/apiServices";
+import { loginAPI, logoutAPI, createPinAPI, getProfileAPI, updateProfileAPI, updatePasswordAPI, registerAPI, updatePinAPI, checkPinAPI, forgotPasswordAPI, verifyOtpAPI, resetPasswordAPI } from "../../services/apiServices";
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
@@ -105,10 +105,45 @@ export const checkUserPin = createAsyncThunk(
   async (payload, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token;
-      const data = await checkProfilePinAPI(payload, token);
+      const data = await checkPinAPI(payload, token);
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
+    }
+  }
+);
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const data = await forgotPasswordAPI(payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message || "Gagal mengirim OTP");
+    }
+  }
+);
+
+export const verifyOtp = createAsyncThunk(
+  "auth/verifyOtp",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const data = await verifyOtpAPI(payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message || "OTP tidak valid");
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const data = await resetPasswordAPI(payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message || "Gagal mereset password");
     }
   }
 );
@@ -261,6 +296,44 @@ const authSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(updateUserPin.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // Forgot Password
+      .addCase(forgotPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // Verify OTP
+      .addCase(verifyOtp.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(verifyOtp.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // Reset Password
+      .addCase(resetPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
