@@ -21,7 +21,6 @@ function ForgotPassword() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -69,7 +68,7 @@ function ForgotPassword() {
     setIsLoading(true);
     setErrorMessage("");
     try {
-      await verifyOtpAPI({ email, otp });
+      await verifyOtpAPI({ email, otp: otpString });
       toast.success("OTP Valid! Silakan buat password baru.");
       setStep(3);
     } catch (error) {
