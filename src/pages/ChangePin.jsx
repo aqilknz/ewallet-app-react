@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Navigate, useNavigate } from "react-router";
 import { usePinLogic } from "../hooks/usePinLogic";
 import { updateUserPin, checkUserPin } from "../redux/slice/authUserSlice";
 import toast from "react-hot-toast";
@@ -8,6 +9,7 @@ import PinInput from "../components/Auth/PinInput";
 
 function ChangePin() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isLoading } = useSelector((state) => state.auth);
   const [step, setStep] = useState(1);
 
@@ -55,6 +57,7 @@ function ChangePin() {
     }
 
     if (newPinLogic.pinString !== confirmPinLogic.pinString) {
+      confirmPinLogic.resetPin();
       return toast.error("New PIN and Confirmation PIN do not match!");
     }
 
@@ -91,6 +94,12 @@ function ChangePin() {
         <img src="/icons/Profile/User-blue.svg" alt="Profile" className="w-5" />
         <h2 className="text-lg font-semibold">Profile</h2>
       </div>
+      <button
+        onClick={() => navigate("/profile")}
+        className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-gray-600 transition-colors hover:bg-primary hover:text-white"
+      >
+        &larr; Back to Profile
+      </button>
 
       <section className="w-full rounded-lg border border-gray-300 p-6 md:p-10">
         <h3 className="mb-3 block text-center text-xl font-bold text-gray-900">
@@ -111,7 +120,10 @@ function ChangePin() {
                 handleKeyDown={oldPinLogic.handleKeyDown}
               />
               <div className="mt-8 w-full">
-                <ButtonSubmit label="Continue" />
+                <ButtonSubmit
+                  label={isLoading ? "Verifying..." : "Continue"}
+                  disabled={isLoading}
+                />
               </div>
             </form>
           )}
